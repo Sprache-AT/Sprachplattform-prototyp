@@ -3,7 +3,7 @@ import CircleMark from './CircleMark';
 import { question } from './types';
 import { LatLngExpression } from 'leaflet';
 
-import * as data from './data/fr30.json';
+import * as data from './data/fr41.json';
 import { useState } from 'react';
 
 type MapProps = {
@@ -29,7 +29,7 @@ export default function Map() {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
       />
-      <CircleMark dataList={dataList} showPropCircles={false} />
+      <CircleMark dataList={dataList} showPropCircles={true} />
     </MapContainer>
   );
 }
