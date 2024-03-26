@@ -1,3 +1,5 @@
+import { circleDiagramData } from '../types';
+
 let colorid: number = 0;
 
 /**
@@ -40,4 +42,32 @@ export const hslToHex = (h: number, s: number, l: number) => {
       .padStart(2, '0'); // convert to Hex and prefix "0" if needed
   };
   return `#${f(0)}${f(8)}${f(4)}`;
+};
+
+/**
+ * Groups the array by the provided key. The key is used to group the array by the value of the passed key.
+ * @param arr Array which is going to be grouped
+ * @param key Key by which are the values to be grouped
+ * @returns
+ */
+export const groupBy = (arr: any[], key: string) => {
+  return arr.reduce((acc, curr) => {
+    (acc[curr[key]] = acc[curr[key]] || []).push(curr);
+    return acc;
+  }, {});
+};
+
+export const groupByValues = (
+  arr: any[],
+  key: string
+): Array<circleDiagramData> => {
+  return arr.reduce((acc, curr) => {
+    const found = acc.find((el: any) => el.id === curr[key]);
+    if (found) {
+      found.v += curr.v;
+    } else {
+      acc.push(curr);
+    }
+    return acc;
+  }, []);
 };
