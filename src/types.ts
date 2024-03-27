@@ -49,3 +49,8 @@ export type evaluatedAnswer = {
   answers: Array<answerCount>;
   geometry: geometry;
 };
+
+export type dropDownEntry = {
+  name: string;
+  value: string;
+};
