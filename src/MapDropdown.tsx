@@ -3,11 +3,11 @@ import { Listbox, Transition } from '@headlessui/react';
 import { FaCheck, FaAngleDown } from 'react-icons/fa6';
 import { dropDownEntry } from './types';
 
-type MapDropdownProps = {
+interface MapDropdownProps {
   entries: Array<dropDownEntry>;
   selected: dropDownEntry;
   setSelected: (val: dropDownEntry) => void;
-};
+}
 
 export default function MapDropdown({
   entries,
