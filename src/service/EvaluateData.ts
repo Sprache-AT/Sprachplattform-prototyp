@@ -4,12 +4,14 @@ import {
   featureAnswer,
   question,
 } from '../types';
-import { generateSingleColor, hslToHex } from './helper';
+import { generateSingleColor, groupBy, hslToHex } from './helper';
 
 // Evaluate the question data and return an array of answerCount
 // Answer Count contains the values (v) with a color (c) and an identifier (id) organized in an array
 // Is organized at a location level
-export const evaluateQuestion = (data: question): Array<evaluatedAnswer> => {
+export const evaluateQuestion = (
+  data: question
+): { data: Array<evaluatedAnswer>; colors: Map<string, string> } => {
   const res = [] as Array<evaluatedAnswer>;
   const colorMap = new Map<string, string>();
   data.features.map((feat) => {
@@ -21,7 +23,7 @@ export const evaluateQuestion = (data: question): Array<evaluatedAnswer> => {
       geometry: feat.geometry,
     });
   });
-  return res;
+  return { data: res, colors: colorMap };
 };
 
 const evaluateSingleLocation = (
@@ -35,8 +37,6 @@ const evaluateSingleLocation = (
       // Check if anno contains more than one answer => has a comma?
       const annos = checkIfDouble(ans.anno);
       // Check if the answer is already in the result array
-      console.log(ans);
-      console.log(annos);
       annos.forEach((elAnno) => {
         const found = res.find((el) => el.id === elAnno && el.reg === ans.reg);
         if (found) {
