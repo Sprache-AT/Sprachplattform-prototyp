@@ -74,7 +74,7 @@ export const drawCircleDiagram = (
   const hSize = size * 0.5 * padding;
   const ihSize = (size - border * 2) * 0.5;
   let out = '';
-  out = `<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+  out = `<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg xmlns="http://www.w3.org/2000/svg" 
     version="1.1" id="graph" width="${viewport}" height="${viewport}" viewBox="0 0 ${viewport} ${viewport}">`;
   if (background) {
     out += `<circle cx="${hSize}" cy="${hSize}" r="${hSize}" fill="${borderColor}" />`;
