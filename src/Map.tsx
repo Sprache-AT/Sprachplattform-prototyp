@@ -1,12 +1,14 @@
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 import CircleMark from './CircleMark';
-import { question } from './types';
+import { evaluatedAnswer, question } from './types';
 import { LatLngExpression, map } from 'leaflet';
 
 import * as data from './data/fr41.json';
 import bundeslaender from './data/bundeslaender.geojson.json';
 
 import { useEffect, useState } from 'react';
+import Legend from './Legend';
+import { evaluateQuestion } from './service/EvaluateData';
 
 type MapProps = {
   visible: boolean;
@@ -16,9 +18,18 @@ type MapProps = {
 export default function Map({ visible, mapLayer }: MapProps) {
   const [zoom, setZoom] = useState(7);
   const [bL, setBl] = useState({} as GeoJSON.FeatureCollection); // Bundesland
+  const [evaluatedData, setEvaluatedData] = useState<
+    Array<evaluatedAnswer> | undefined
+  >(undefined);
+  const [usedColors, setUsedColors] = useState<Map<string, string>>();
   const position: LatLngExpression = [47.5939, 14.1245];
   const dataList: question = data as question;
   console.log(visible);
+  useEffect(() => {
+    const { data, colors } = evaluateQuestion(dataList);
+    setEvaluatedData(data);
+    setUsedColors(colors);
+  }, []);
   return (
     <MapContainer
       maxZoom={10}
@@ -29,6 +40,7 @@ export default function Map({ visible, mapLayer }: MapProps) {
       zoom={zoom}
       scrollWheelZoom={true}
     >
+      <Legend colors={usedColors} />
       {mapLayer === 'geojson' ? (
         <GeoJSON
           attribution='&copy; SFB/DiÖ'
@@ -42,7 +54,11 @@ export default function Map({ visible, mapLayer }: MapProps) {
         />
       )}
 
-      <CircleMark dataList={dataList} showPropCircles={true} />
+      <CircleMark
+        dataList={dataList}
+        showPropCircles={true}
+        evaluatedData={evaluatedData}
+      />
     </MapContainer>
   );
 }

@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 type CircleMarkProps = {
   dataList: question;
   showPropCircles: boolean;
+  evaluatedData?: Array<evaluatedAnswer>;
 };
 
 // Create function with prop dataList of type any
@@ -18,17 +19,11 @@ type CircleMarkProps = {
 export default function CircleMark({
   dataList,
   showPropCircles,
+  evaluatedData,
 }: CircleMarkProps) {
-  const [evaluatedData, setEvaluatedData] = useState<
-    Array<evaluatedAnswer> | undefined
-  >(undefined);
   // TODO Leverage this to adapt the size based on zoom level
   const map = useMap();
   const baseSize = 1300;
-  useEffect(() => {
-    const evalData = evaluateQuestion(dataList);
-    setEvaluatedData(evalData);
-  }, []);
   // Show the proportional circles based on the evaluated data
   if (showPropCircles) {
     return (
