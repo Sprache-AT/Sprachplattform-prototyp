@@ -5,6 +5,7 @@ import { LatLngExpression, map } from 'leaflet';
 
 import * as data from './data/fr41.json';
 import bundeslaender from './data/bundeslaender.geojson.json';
+import dialectregions from './data/All_Dialektregionen_no_formatting.geojson.json';
 
 import { useEffect, useState } from 'react';
 import Legend from './Legend';
@@ -41,6 +42,14 @@ export default function Map({ visible, mapLayer }: MapProps) {
       scrollWheelZoom={true}
     >
       <Legend colors={usedColors} />
+      {mapLayer === 'dialect' ? (
+        <GeoJSON
+          attribution='&copy; SFB/DiÖ'
+          data={dialectregions as GeoJSON.FeatureCollection}
+        />
+      ) : (
+        ''
+      )}
       {mapLayer === 'geojson' ? (
         <GeoJSON
           attribution='&copy; SFB/DiÖ'

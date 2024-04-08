@@ -13,6 +13,7 @@ function App() {
   const entries: Array<dropDownEntry> = [
     { name: 'OpenStreetMap Tileset', value: 'osm' },
     { name: 'Bundesländer GeoJSON', value: 'geojson' },
+    { name: 'Dialektregionen', value: 'dialect' },
   ];
   const [selected, setSelected] = useState(
     entries && entries.length > 0 ? entries[0] : { name: '', value: '' }
