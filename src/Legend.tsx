@@ -7,7 +7,6 @@ interface LegendProps {
 
 export default function Legend({ colors }: LegendProps) {
   const map = useMap();
-  console.log(colors);
   if (!colors || colors.size === 0) return null;
   const legend = new Control({ position: 'bottomright' });
   legend.onAdd = function (map) {
