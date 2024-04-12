@@ -1,36 +1,35 @@
-import React, { useState } from 'react';
-
+import { useEffect, useState } from 'react';
 import './App.css';
 
-import 'leaflet/dist/leaflet.css';
+import MapAnalysis from './MapAnalysis.tsx';
 
-import WorkBox from './WorkBox.tsx';
-import Map from './Map.tsx';
-import { dropDownEntry } from './types.ts';
-import MapDropdown from './MapDropdown.tsx';
+import * as dataFr41 from './data/fr41.json';
+import * as dataFr3 from './data/fr3.json';
+import { evaluatedAnswer, question } from './types.ts';
+import { evaluateQuestion } from './service/EvaluateData.ts';
 
 function App() {
-  const entries: Array<dropDownEntry> = [
-    { name: 'OpenStreetMap Tileset', value: 'osm' },
-    { name: 'Bundesländer GeoJSON', value: 'geojson' },
-    { name: 'Dialektregionen', value: 'dialect' },
-  ];
-  const [selected, setSelected] = useState(
-    entries && entries.length > 0 ? entries[0] : { name: '', value: '' }
-  );
-  const MapComponent = () => (
-    <Map visible={true} mapLayer={selected.value}></Map>
-  );
-  const Dropwdown = () => (
-    <MapDropdown
-      entries={entries}
-      selected={selected}
-      setSelected={(val: dropDownEntry) => setSelected(val)}
-    ></MapDropdown>
-  );
+  const dataListFr41: question = dataFr41 as question;
+  const dataListFr3: question = dataFr3 as question;
+  const dataList = [dataListFr41, dataListFr3];
+
+  const [evaluatedData, setEvaluatedData] = useState<
+    Array<evaluatedAnswer> | undefined
+  >(undefined);
+  const [usedColors, setUsedColors] = useState<Map<string, string>>();
+  useEffect(() => {
+    dataList.map((content, idx) => {
+      const { data, colors } = evaluateQuestion(content);
+      if (idx === 0) {
+        // Set the data for the first element with color
+        setEvaluatedData(data);
+        setUsedColors(colors);
+      }
+    });
+  }, []);
   return (
     <>
-      <WorkBox Element={MapComponent} UiElements={[Dropwdown]}></WorkBox>
+      <MapAnalysis evaluatedData={evaluatedData} usedColors={usedColors} />
     </>
   );
 }
