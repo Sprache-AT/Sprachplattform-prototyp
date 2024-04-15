@@ -47,9 +47,8 @@ export default function CircleMark({
                 baseSize *
                 determineSize(
                   feat.properties.length,
-                  [0, 1, 2, 10, 20, 100], // Adapt the current brackets to the current data
+                  [0, 1, 2, 10, 20, 100] // Adapt the current brackets to the current data
                   // 0-1, 2-9, 10-19, 20-99, 100+
-                  baseSize
                 )
               }
             >

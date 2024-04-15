@@ -4,7 +4,7 @@ import {
   featureAnswer,
   question,
 } from '../types';
-import { generateSingleColor, groupBy, hslToHex } from './helper';
+import { generateSingleColor, hslToHex } from './helper';
 
 // Evaluate the question data and return an array of answerCount
 // Answer Count contains the values (v) with a color (c) and an identifier (id) organized in an array
@@ -31,7 +31,7 @@ const evaluateSingleLocation = (
   colors: Map<string, string>
 ): Array<answerCount> => {
   const res = [] as Array<answerCount>;
-  data.properties.map((prop, idx) => {
+  data.properties.map((prop) => {
     // Count the answers for each person
     prop.answers.map((ans) => {
       // Check if anno contains more than one answer => has a comma?

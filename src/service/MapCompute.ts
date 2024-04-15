@@ -47,8 +47,7 @@ const describeArc = (
 
 export const determineSize = (
   numValues: number,
-  brackets: number[],
-  baseValue: number
+  brackets: number[]
 ): number => {
   if (!brackets || brackets.length < 1) return 1;
   for (let i = 0; i < brackets.length - 1; i++) {
