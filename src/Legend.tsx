@@ -1,4 +1,4 @@
-import { LayersControl, useMap } from 'react-leaflet';
+import { useMap } from 'react-leaflet';
 import { Control, DomUtil } from 'leaflet';
 
 interface LegendProps {
@@ -9,7 +9,7 @@ export default function Legend({ colors }: LegendProps) {
   const map = useMap();
   if (!colors || colors.size === 0) return null;
   const legend = new Control({ position: 'bottomright' });
-  legend.onAdd = function (map) {
+  legend.onAdd = function () {
     const div = DomUtil.create('div', 'info legend');
     const size = 15;
     div.className = 'bg-white w-fit p-2 rounded-lg shadow-md';

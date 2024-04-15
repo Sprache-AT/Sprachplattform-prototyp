@@ -16,7 +16,7 @@ export default function MapAnalysis({
   evaluatedData,
   usedColors,
 }: MapAnalysisProps) {
-  const entries: Array<dropDownEntry> = [
+  const entries: Array<dropDownEntry<undefined>> = [
     { name: 'OpenStreetMap Tileset', value: 'osm' },
     { name: 'Bundesländer GeoJSON', value: 'geojson' },
   ];
@@ -40,7 +40,7 @@ export default function MapAnalysis({
     <MapDropdown
       entries={entries}
       selected={selected}
-      setSelected={(val: dropDownEntry) => setSelected(val)}
+      setSelected={(val: dropDownEntry<undefined>) => setSelected(val)}
     ></MapDropdown>
   );
 
@@ -50,6 +50,11 @@ export default function MapAnalysis({
       onChange={(val: boolean) => setShowDialects(val)}
     ></CheckboxComp>
   );
+
+  /*
+  const dataDropdown = () => {
+    "Dropdown";
+  };*/
   return (
     <>
       <WorkBox

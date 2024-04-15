@@ -3,7 +3,7 @@ import { evaluatedAnswer } from './types';
 import { drawCircleDiagram } from './service/MapCompute';
 
 import L from 'leaflet';
-import { groupBy, groupByValues } from './service/helper';
+import { groupByValues } from './service/helper';
 import CircleIcon from './CircleIcon';
 
 type CircleMarkDiagramProps = {

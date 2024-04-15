@@ -3,18 +3,18 @@ import { Listbox, Transition } from '@headlessui/react';
 import { FaCheck, FaAngleDown } from 'react-icons/fa6';
 import { dropDownEntry } from './types';
 
-interface MapDropdownProps {
-  entries: Array<dropDownEntry>;
-  selected: dropDownEntry;
-  setSelected: (val: dropDownEntry) => void;
+interface MapDropdownProps<T> {
+  entries: Array<dropDownEntry<T>>;
+  selected: dropDownEntry<T>;
+  setSelected: (val: dropDownEntry<T>) => void;
 }
 
-export default function MapDropdown({
+export default function MapDropdown<T>({
   entries,
   selected,
   setSelected,
-}: MapDropdownProps) {
-  function handleChange(val: dropDownEntry) {
+}: MapDropdownProps<T>) {
+  function handleChange(val: dropDownEntry<T>) {
     setSelected(val);
   }
 

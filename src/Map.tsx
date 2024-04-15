@@ -1,13 +1,13 @@
-import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 import CircleMark from './CircleMark';
 import { evaluatedAnswer, question } from './types';
-import { LatLngExpression, map } from 'leaflet';
+import { LatLngExpression } from 'leaflet';
 
 import * as data from './data/fr41.json';
 import bundeslaender from './data/bundeslaender.geojson.json';
 import dialectregions from './data/All_Dialektregionen_no_formatting.geojson.json';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import Legend from './Legend';
 
 type MapProps = {
@@ -25,10 +25,11 @@ export default function Map({
   usedColors,
   evaluatedData,
 }: MapProps) {
+  //@ts-ignore
   const [zoom, setZoom] = useState(7);
-  const [bL, setBl] = useState({} as GeoJSON.FeatureCollection); // Bundesland
   const position: LatLngExpression = [47.5939, 14.1245];
   const dataList: question = data as question;
+  console.log(visible);
   return (
     <MapContainer
       maxZoom={10}
