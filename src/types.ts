@@ -50,7 +50,8 @@ export type evaluatedAnswer = {
   geometry: geometry;
 };
 
-export type dropDownEntry = {
+export type dropDownEntry<T> = {
   name: string;
   value: string;
+  entries?: T;
 };
