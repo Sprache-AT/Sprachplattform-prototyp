@@ -1,11 +1,9 @@
 import { LatLngExpression } from 'leaflet';
-import { determineSize, drawCircleDiagram } from './service/MapCompute';
-import { Circle, Popup, useMap, Marker } from 'react-leaflet';
+import { determineSize } from './service/MapCompute';
+import { Circle, Popup } from 'react-leaflet';
 
 import { evaluatedAnswer, question } from './types';
-import { evaluateQuestion } from './service/EvaluateData';
 import CircleMarkDiagram from './CircleMarkDiagram';
-import { useEffect, useState } from 'react';
 
 type CircleMarkProps = {
   dataList: question;
@@ -22,7 +20,7 @@ export default function CircleMark({
   evaluatedData,
 }: CircleMarkProps) {
   // TODO Leverage this to adapt the size based on zoom level
-  const map = useMap();
+  // const map = useMap();
   const baseSize = 1300;
   // Show the proportional circles based on the evaluated data
   if (showPropCircles) {
