@@ -7,15 +7,15 @@ import * as data from './data/fr41.json';
 import bundeslaender from './data/bundeslaender.geojson.json';
 import dialectregions from './data/All_Dialektregionen_no_formatting.geojson.json';
 
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import Legend from './Legend';
+import { QuestionContext } from './App';
 
 type MapProps = {
   visible: boolean;
   mapLayer: string;
   showDialect: boolean;
   usedColors: Map<string, string> | undefined;
-  evaluatedData: Array<evaluatedAnswer> | undefined;
 };
 
 export default function Map({
@@ -23,12 +23,15 @@ export default function Map({
   mapLayer,
   showDialect,
   usedColors,
-  evaluatedData,
 }: MapProps) {
   //@ts-ignore
   const [zoom, setZoom] = useState(7);
   const position: LatLngExpression = [47.5939, 14.1245];
   const dataList: question = data as question;
+
+  const evaluatedData: Array<evaluatedAnswer> | null =
+    useContext(QuestionContext);
+
   console.log(visible);
   return (
     <MapContainer
@@ -65,7 +68,7 @@ export default function Map({
       <CircleMark
         dataList={dataList}
         showPropCircles={true}
-        evaluatedData={evaluatedData}
+        evaluatedData={evaluatedData ? evaluatedData : []}
       />
     </MapContainer>
   );

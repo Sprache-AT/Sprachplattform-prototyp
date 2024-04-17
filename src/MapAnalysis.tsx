@@ -8,13 +8,13 @@ import CheckboxComp from './CheckboxComp';
 import 'leaflet/dist/leaflet.css';
 
 interface MapAnalysisProps {
-  evaluatedData: Array<evaluatedAnswer> | undefined;
   usedColors: Map<string, string> | undefined;
+  questionData: Array<dropDownEntry<evaluatedAnswer[]>>;
 }
 
 export default function MapAnalysis({
-  evaluatedData,
   usedColors,
+  questionData,
 }: MapAnalysisProps) {
   const entries: Array<dropDownEntry<undefined>> = [
     { name: 'OpenStreetMap Tileset', value: 'osm' },
@@ -30,10 +30,9 @@ export default function MapAnalysis({
   const MapComponent = () => (
     <Map
       visible={true}
-      mapLayer={selected.value}
+      mapLayer={selected.value as string}
       showDialect={showDialects}
       usedColors={usedColors}
-      evaluatedData={evaluatedData}
     ></Map>
   );
   const Dropdown = () => (
@@ -50,11 +49,14 @@ export default function MapAnalysis({
       onChange={(val: boolean) => setShowDialects(val)}
     ></CheckboxComp>
   );
-
   /*
-  const dataDropdown = () => {
-    "Dropdown";
-  };*/
+  const DataDropdown = () => (
+    <MapDropdown
+      entries={questionData}
+      selected={selectedQ}
+      setSelected={(val: dropDownEntry<evaluatedAnswer[]>) => setSelectedQ(val)}
+    ></MapDropdown>
+  );*/
   return (
     <>
       <WorkBox
