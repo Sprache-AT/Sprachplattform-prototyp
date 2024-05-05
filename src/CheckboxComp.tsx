@@ -5,7 +5,6 @@ interface CheckboxCompProps {
 
 export default function CheckboxComp({ label, onChange }: CheckboxCompProps) {
   function handleChange(val: boolean) {
-    console.log(val);
     onChange(val);
   }
   return (
