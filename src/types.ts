@@ -52,6 +52,11 @@ export type evaluatedAnswer = {
 
 export type dropDownEntry<T> = {
   name: string;
-  value: string;
+  value: string | number;
   entries?: T;
+};
+
+export type questionColors = {
+  qId: number;
+  colors: Map<string, string>;
 };
