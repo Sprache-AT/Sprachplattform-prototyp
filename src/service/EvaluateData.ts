@@ -10,12 +10,13 @@ import { generateSingleColor, hslToHex } from './helper';
 // Answer Count contains the values (v) with a color (c) and an identifier (id) organized in an array
 // Is organized at a location level
 export const evaluateQuestion = (
-  data: question
+  data: question,
+  colors: Array<string>
 ): { data: Array<evaluatedAnswer>; colors: Map<string, string> } => {
   const res = [] as Array<evaluatedAnswer>;
   const colorMap = new Map<string, string>();
   data.features.map((feat) => {
-    let singleLocation = evaluateSingleLocation(feat, colorMap);
+    let singleLocation = evaluateSingleLocation(feat, colorMap, colors);
     res.push({
       location: feat.location,
       PLZ: feat.PLZ,
@@ -28,7 +29,8 @@ export const evaluateQuestion = (
 
 const evaluateSingleLocation = (
   data: featureAnswer,
-  colors: Map<string, string>
+  colors: Map<string, string>,
+  existingColors: Array<string>
 ): Array<answerCount> => {
   const res = [] as Array<answerCount>;
   data.properties.map((prop) => {
@@ -49,8 +51,14 @@ const evaluateSingleLocation = (
           if (!color) {
             // If it does not exist, generate a new color
             // Generate Color as HSL and convert it to a Hex RGB String
-            const hslColor = generateSingleColor(null);
-            color = hslToHex(hslColor.h, hslColor.s * 100, hslColor.l * 100);
+            // Check if there is a color in the existing colors
+            if (existingColors.length > 0) {
+              // We know that there is a color in the array
+              color = existingColors.pop() as string;
+            } else {
+              const hslColor = generateSingleColor(null);
+              color = hslToHex(hslColor.h, hslColor.s * 100, hslColor.l * 100);
+            }
             // Add it to the map for later use
             colors.set(elAnno, color);
           }
