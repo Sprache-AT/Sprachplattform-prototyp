@@ -1,6 +1,6 @@
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 import CircleMark from './CircleMark';
-import { evaluatedAnswer, question } from './types';
+import { dropDownEntry, evaluatedAnswer, question } from './types';
 import { LatLngExpression } from 'leaflet';
 
 import * as data from './data/fr41.json';
@@ -16,6 +16,7 @@ type MapProps = {
   mapLayer: string;
   showDialect: boolean;
   usedColors: Map<string, string> | undefined;
+  selectedQuestion: dropDownEntry<evaluatedAnswer[]>;
 };
 
 export default function Map({
@@ -23,6 +24,7 @@ export default function Map({
   mapLayer,
   showDialect,
   usedColors,
+  selectedQuestion,
 }: MapProps) {
   //@ts-ignore
   const [zoom, setZoom] = useState(7);
@@ -32,7 +34,6 @@ export default function Map({
   const evaluatedData: Array<evaluatedAnswer> | null =
     useContext(QuestionContext);
 
-  console.log(visible);
   return (
     <MapContainer
       maxZoom={10}
@@ -65,11 +66,17 @@ export default function Map({
         />
       )}
 
-      <CircleMark
-        dataList={dataList}
-        showPropCircles={true}
-        evaluatedData={evaluatedData ? evaluatedData : []}
-      />
+      {selectedQuestion ? (
+        <CircleMark
+          dataList={dataList}
+          showPropCircles={true}
+          evaluatedData={
+            selectedQuestion.entries ? selectedQuestion.entries : []
+          }
+        />
+      ) : (
+        ''
+      )}
     </MapContainer>
   );
 }

@@ -5,7 +5,12 @@ import MapAnalysis from './MapAnalysis.tsx';
 
 import * as dataFr41 from './data/fr41.json';
 import * as dataFr3 from './data/fr3.json';
-import { dropDownEntry, evaluatedAnswer, question } from './types.ts';
+import {
+  dropDownEntry,
+  evaluatedAnswer,
+  question,
+  questionColors,
+} from './types.ts';
 import { evaluateQuestion } from './service/EvaluateData.ts';
 
 export const QuestionContext = createContext<Array<evaluatedAnswer> | null>(
@@ -19,7 +24,7 @@ function App() {
 
   const [evaluatedData, setEvaluatedData] =
     useState<Array<evaluatedAnswer> | null>(null);
-  const [usedColors, setUsedColors] = useState<Map<string, string>>();
+  const [usedColors, setUsedColors] = useState<Array<questionColors>>();
 
   const [questionData, setQuestionData] = useState<
     Array<dropDownEntry<evaluatedAnswer[]>>
@@ -27,11 +32,13 @@ function App() {
 
   useEffect(() => {
     const res: Array<dropDownEntry<evaluatedAnswer[]>> = [];
+    const questionColors = [] as Array<questionColors>;
+    const currColors: Array<string> = [];
+
     dataList.map((content, idx) => {
-      const { data, colors } = evaluateQuestion(
-        content,
-        Array.from(usedColors ? usedColors.values() : [])
-      );
+      const { data, colors } = evaluateQuestion(content, currColors);
+      questionColors.push({ qId: idx, colors: colors });
+      currColors.push(...colors.values());
       res.push({
         name: `Frage ${content.features[0].title}`,
         value: idx,
@@ -40,16 +47,23 @@ function App() {
       if (idx === 0) {
         // Set the data for the first element with color
         setEvaluatedData(data);
-        setUsedColors(colors);
       }
     });
+    setUsedColors(questionColors);
     setQuestionData(res);
   }, []);
 
   return (
     <>
       <QuestionContext.Provider value={evaluatedData}>
-        <MapAnalysis questionData={questionData} usedColors={usedColors} />
+        {questionData.length > 0 && usedColors ? (
+          <MapAnalysis
+            questionData={questionData}
+            usedColors={usedColors}
+          ></MapAnalysis>
+        ) : (
+          'Loading...'
+        )}
       </QuestionContext.Provider>
     </>
   );

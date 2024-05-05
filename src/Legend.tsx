@@ -31,7 +31,7 @@ export default function Legend({ colors }: LegendProps) {
           stroke='black'
           strokeWidth=0.2
         />
-      </svg><i style="background:${value}"></i> ${key}</div>`;
+      </svg><i style="background:${value}"></i>${key}</div>`;
       });
     }
     return div;
