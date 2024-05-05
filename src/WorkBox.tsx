@@ -29,7 +29,7 @@ export default function WorkBox({
                   className='z-50 items-center justify-center'
                   key={`uielement-${idx}`}
                 >
-                  <UiElement></UiElement>
+                  <UiElement />
                 </div>
               );
             })}
