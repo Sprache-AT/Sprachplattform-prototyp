@@ -23,12 +23,12 @@ export default function WorkBox({
       <div className='bg-gray-500 rounded-md p-5 h-full'>
         <div className='flex flex-row'>
           <div
-            className={`basis-5/6 flex flex-row space-x-10 justify-items-center justify-start`}
+            className={`basis-5/6 grid grid-cols-3 gap-4 space-x-10 justify-items-center justify-start`}
           >
             {UiElements &&
               UiElements.map((UiElement, idx) => {
                 return (
-                  <div key={`uielement-${idx}`}>
+                  <div className='z-50' key={`uielement-${idx}`}>
                     <UiElement />
                   </div>
                 );
