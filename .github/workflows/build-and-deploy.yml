@@ -116,7 +116,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
   _3:
     needs: [setup_workflow_env, generate_workflow_vars, build-and-push-image]
-    uses: german-in-austria/gl-autodevops-minimal-port/.github/workflows/deploy.yml@main
+    uses: Sprache-AT/gl-autodevops-minimal-port/.github/workflows/deploy.yml@main
     secrets: inherit
     with:
       environment: ${{ needs.setup_workflow_env.outputs.environment}}
