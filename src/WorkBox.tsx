@@ -54,7 +54,9 @@ export default function WorkBox({
             </button>
           </div>
         </div>
-        <Element />
+        <div className={`h-full ${vis ? 'visible' : 'hidden'}`}>
+          <Element />
+        </div>
         {children}
       </div>
     </>

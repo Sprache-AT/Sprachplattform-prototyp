@@ -3,5 +3,5 @@ interface TextComponentProps {
 }
 
 export default function TextComponent({ text }: TextComponentProps) {
-  return <div>{text}</div>;
+  return <div className='text-white'>{text}</div>;
 }

@@ -37,9 +37,7 @@ export default function Map({
   return (
     <MapContainer
       maxZoom={10}
-      className={`-z-0 flex-auto h-5/6 w-full relative ${
-        true ? 'visible' : 'hidden'
-      }`}
+      className={`-z-0 w-full min-h-[60vh] ${true ? 'visible' : 'hidden'}`}
       center={position}
       zoom={zoom}
       scrollWheelZoom={true}
