@@ -38,7 +38,6 @@ const MapComponent = (
   const selectedQuestion = useSelectedQuestion();
   return (
     <Map
-      visible={true}
       mapLayer={selected.value as string}
       showDialect={showDialects}
       usedColors={usedColors[selectedQuestion.value as number].colors}

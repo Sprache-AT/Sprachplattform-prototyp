@@ -7,12 +7,10 @@ import * as data from './data/fr41.json';
 import bundeslaender from './data/bundeslaender.geojson.json';
 import dialectregions from './data/All_Dialektregionen_no_formatting.geojson.json';
 
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import Legend from './Legend';
-import { QuestionContext } from './App';
 
 type MapProps = {
-  visible: boolean;
   mapLayer: string;
   showDialect: boolean;
   usedColors: Map<string, string> | undefined;
@@ -20,7 +18,6 @@ type MapProps = {
 };
 
 export default function Map({
-  visible,
   mapLayer,
   showDialect,
   usedColors,
@@ -30,9 +27,6 @@ export default function Map({
   const [zoom, setZoom] = useState(7);
   const position: LatLngExpression = [47.5939, 14.1245];
   const dataList: question = data as question;
-
-  const evaluatedData: Array<evaluatedAnswer> | null =
-    useContext(QuestionContext);
 
   return (
     <MapContainer
