@@ -23,17 +23,12 @@ export default function WorkBox({
       <div className='bg-gray-500 rounded-md p-5 h-full'>
         <div className='flex flex-row'>
           <div
-            className={`basis-5/6 grid grid-cols-${
-              UiElements && UiElements.length > 0 ? UiElements.length : 0
-            } gap-4`}
+            className={`basis-5/6 flex flex-row space-x-10 justify-items-center justify-start`}
           >
             {UiElements &&
               UiElements.map((UiElement, idx) => {
                 return (
-                  <div
-                    className='z-50 items-center justify-center'
-                    key={`uielement-${idx}`}
-                  >
+                  <div key={`uielement-${idx}`}>
                     <UiElement />
                   </div>
                 );
@@ -54,7 +49,7 @@ export default function WorkBox({
             </button>
           </div>
         </div>
-        <div className={`h-full ${vis ? 'visible' : 'hidden'}`}>
+        <div className={`${vis ? 'visible' : 'hidden'}`}>
           <Element />
         </div>
         {children}
