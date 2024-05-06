@@ -20,7 +20,7 @@ export default function MapDropdown<T>({
 
   if (selected) {
     return (
-      <div className='fixed w-72'>
+      <div className='w-72'>
         <Listbox
           value={selected ? selected : entries[0]}
           onChange={handleChange}
