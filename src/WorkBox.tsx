@@ -21,19 +21,25 @@ export default function WorkBox({
   return (
     <>
       <div className='bg-gray-500 rounded-md p-5 h-full'>
-        <div className='grid grid-cols-3 gap-4'>
-          {UiElements &&
-            UiElements.map((UiElement, idx) => {
-              return (
-                <div
-                  className='z-50 items-center justify-center'
-                  key={`uielement-${idx}`}
-                >
-                  <UiElement />
-                </div>
-              );
-            })}
-          <div className='basis-1/2 justify-end justify-items-end justify-self-end flex-row space-x-5 mb-5'>
+        <div className='flex flex-row'>
+          <div
+            className={`basis-5/6 grid grid-cols-${
+              UiElements && UiElements.length > 0 ? UiElements.length : 0
+            } gap-4`}
+          >
+            {UiElements &&
+              UiElements.map((UiElement, idx) => {
+                return (
+                  <div
+                    className='z-50 items-center justify-center'
+                    key={`uielement-${idx}`}
+                  >
+                    <UiElement />
+                  </div>
+                );
+              })}
+          </div>
+          <div className='basis-1/6 justify-end justify-items-end justify-self-end space-x-5 mb-5'>
             {vis ? (
               <button onClick={handleVisChange} className='bg-red-50'>
                 <FaAngleDown color='black' />
