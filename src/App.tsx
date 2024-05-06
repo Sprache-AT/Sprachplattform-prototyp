@@ -12,6 +12,8 @@ import {
   questionColors,
 } from './types.ts';
 import { evaluateQuestion } from './service/EvaluateData.ts';
+import WorkBox from './WorkBox.tsx';
+import TextComponent from './TextComponent.tsx';
 
 export const QuestionContext = createContext<Array<evaluatedAnswer> | null>(
   null
@@ -55,16 +57,23 @@ function App() {
 
   return (
     <>
-      <QuestionContext.Provider value={evaluatedData}>
-        {questionData.length > 0 && usedColors ? (
-          <MapAnalysis
-            questionData={questionData}
-            usedColors={usedColors}
-          ></MapAnalysis>
-        ) : (
-          'Loading...'
-        )}
-      </QuestionContext.Provider>
+      <div className='columns-1'>
+        <div className='w-full h-screen'>
+          <QuestionContext.Provider value={evaluatedData}>
+            {questionData.length > 0 && usedColors ? (
+              <MapAnalysis
+                questionData={questionData}
+                usedColors={usedColors}
+              ></MapAnalysis>
+            ) : (
+              'Loading...'
+            )}
+          </QuestionContext.Provider>
+        </div>
+        <div className='h-full mt-10'>
+          <WorkBox Element={() => <TextComponent text={'test123'} />} />
+        </div>
+      </div>
     </>
   );
 }
