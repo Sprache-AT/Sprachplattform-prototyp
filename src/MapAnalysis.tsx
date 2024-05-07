@@ -152,7 +152,7 @@ export default function MapAnalysis({
                 { title: 'Ort', isSortable: true },
                 { title: 'Variante', isSortable: false },
                 { title: 'Anzahl', isSortable: true },
-                { title: 'Registerbezeichnung', isSortable: false },
+                { title: 'Registerbezeichnung', isSortable: true },
               ])
             }
           ></WorkBox>
