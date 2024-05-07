@@ -6,6 +6,7 @@ import MapDropdown from './MapDropdown';
 import CheckboxComp from './CheckboxComp';
 
 import 'leaflet/dist/leaflet.css';
+import Table from './Table';
 
 const SelectedContext = createContext<dropDownEntry<undefined> | null>(null);
 const SelectedQuestion = createContext<dropDownEntry<evaluatedAnswer[]> | null>(
@@ -30,6 +31,34 @@ function useSelectedQuestion() {
   return context;
 }
 
+const TableComponent = (
+  tableHeads: Array<{ title: string; isSortable: boolean }>
+) => {
+  const selectedQuestion = useSelectedQuestion();
+  const tableContent: Array<Array<string>> = [];
+  if (selectedQuestion.entries) {
+    selectedQuestion.entries.map((entry) => {
+      let variants: Array<string> = [];
+      const location = `${entry.location}, ${entry.PLZ}`;
+      entry.answers.map((answer) => {
+        const variant = answer.answer;
+        const num = answer.v.toString();
+        const reg = answer.reg;
+        variants = [variant, num, reg];
+      });
+      tableContent.push([location, ...variants]);
+    });
+  }
+  return (
+    <Table
+      headerTitle={selectedQuestion.name}
+      headerDesc={'Beispielbeschreibung'}
+      tableHeads={tableHeads}
+      tableContent={tableContent}
+    />
+  );
+};
+
 const MapComponent = (
   showDialects: boolean,
   usedColors: Array<questionColors>
@@ -45,6 +74,7 @@ const MapComponent = (
     ></Map>
   );
 };
+
 const Dropdown = (
   layerEntries: dropDownEntry<undefined>[],
   setSelected: (arg0: dropDownEntry<undefined>) => void
@@ -115,6 +145,18 @@ export default function MapAnalysis({
             () => DataDropdown(questionData, setSelectedQ),
           ]}
         ></WorkBox>
+        <div className='mt-10'>
+          <WorkBox
+            Element={() =>
+              TableComponent([
+                { title: 'Ort', isSortable: true },
+                { title: 'Variante', isSortable: false },
+                { title: 'Anzahl', isSortable: true },
+                { title: 'Registerbezeichnung', isSortable: false },
+              ])
+            }
+          ></WorkBox>
+        </div>
       </SelectedContext.Provider>
     </SelectedQuestion.Provider>
   );
