@@ -58,7 +58,7 @@ function App() {
   return (
     <>
       <div className='columns-1'>
-        <div className='h-full'>
+        <div>
           <QuestionContext.Provider value={evaluatedData}>
             {questionData.length > 0 && usedColors ? (
               <MapAnalysis
