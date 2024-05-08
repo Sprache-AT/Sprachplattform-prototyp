@@ -23,7 +23,9 @@ export default function WorkBox({
       <div className='bg-gray-500 rounded-md p-5'>
         <div className='flex flex-row'>
           <div
-            className={`basis-5/6 grid grid-cols-3 gap-4 space-x-10 justify-items-center justify-start`}
+            className={`basis-5/6 grid grid-cols-${
+              UiElements ? UiElements.length : 0
+            } gap-4 space-x-10 justify-items-center justify-start`}
           >
             {UiElements &&
               UiElements.map((UiElement, idx) => {
