@@ -116,10 +116,14 @@ const Dropdown = (
   );
 };
 
-const Checkbox = (setShowDialects: (arg0: boolean) => void) => (
+const Checkbox = (
+  showDialect: boolean,
+  setShowDialects: (arg0: boolean) => void
+) => (
   <CheckboxComp
     label={'Dialektregionen anzeigen'}
     onChange={(val: boolean) => setShowDialects(val)}
+    isChecked={showDialect}
   ></CheckboxComp>
 );
 
@@ -212,7 +216,7 @@ export default function MapAnalysis({
           Element={() => MapComponent(showDialects, usedColors)}
           UiElements={[
             () => Dropdown(layerEntries, setSelected),
-            () => Checkbox(setShowDialects),
+            () => Checkbox(showDialects, setShowDialects),
             () => DataDropdown(questionData, setSelectedQ),
             () => RegDropDown(regDropdown, selectedReg, setSelectedReg),
           ]}
