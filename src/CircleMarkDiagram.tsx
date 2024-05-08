@@ -7,13 +7,15 @@ import { groupByValues } from './service/helper';
 import CircleIcon from './CircleIcon';
 
 type CircleMarkDiagramProps = {
-  data: Array<evaluatedAnswer>;
+  inputData: Array<evaluatedAnswer>;
 };
 
-export default function CircleMarkDiagram({ data }: CircleMarkDiagramProps) {
+export default function CircleMarkDiagram({
+  inputData,
+}: CircleMarkDiagramProps) {
   return (
     <>
-      {data.map((loc, idx) => {
+      {inputData.map((loc, idx) => {
         if (
           loc.answers.length > 0 &&
           loc.geometry.coordinates &&
@@ -49,7 +51,7 @@ export default function CircleMarkDiagram({ data }: CircleMarkDiagramProps) {
                       <div key={`answer-${idx}`} className='flex'>
                         <CircleIcon color={ans.c} size={15} />
                         <div className='ml-2'>
-                          {ans.id}: {ans.v}
+                          {ans.id}: {ans.v}, Register: {ans.reg}
                         </div>
                       </div>
                     );

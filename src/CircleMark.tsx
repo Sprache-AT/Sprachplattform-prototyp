@@ -25,7 +25,13 @@ export default function CircleMark({
   // Show the proportional circles based on the evaluated data
   if (showPropCircles) {
     return (
-      <>{evaluatedData ? <CircleMarkDiagram data={evaluatedData} /> : <></>}</>
+      <>
+        {evaluatedData ? (
+          <CircleMarkDiagram inputData={evaluatedData} />
+        ) : (
+          <></>
+        )}
+      </>
     );
   }
   return (
