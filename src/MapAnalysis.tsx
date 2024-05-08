@@ -9,9 +9,10 @@ import 'leaflet/dist/leaflet.css';
 import Table from './Table';
 
 const SelectedContext = createContext<dropDownEntry<undefined> | null>(null);
-const SelectedQuestion = createContext<dropDownEntry<evaluatedAnswer[]> | null>(
-  null
-);
+const SelectedQuestion = createContext<{
+  question: dropDownEntry<evaluatedAnswer[]>;
+  selectedReg: dropDownEntry<undefined>;
+} | null>(null);
 
 function useSelection() {
   const context = useContext(SelectedContext);
@@ -28,7 +29,32 @@ function useSelectedQuestion() {
       'useSelectedQuestion must be used within a SelectedQuestion'
     );
   }
-  return context;
+  let entries = context.question.entries;
+  if (context.selectedReg.value !== '') {
+    entries = filterQuestionByReg(context.question, context.selectedReg.name);
+  }
+
+  return {
+    question: {
+      name: context.question.name,
+      value: context.question.value,
+      entries: entries,
+    },
+    selectedReg: context.selectedReg,
+  };
+}
+
+function filterQuestionByReg(
+  question: dropDownEntry<evaluatedAnswer[]>,
+  reg: string
+): evaluatedAnswer[] {
+  if (question.entries) {
+    return question.entries.map((entry) => {
+      const res = entry.answers.filter((ans) => ans.reg === reg);
+      return { ...entry, answers: res };
+    });
+  }
+  return [];
 }
 
 const TableComponent = (
@@ -36,8 +62,8 @@ const TableComponent = (
 ) => {
   const selectedQuestion = useSelectedQuestion();
   const tableContent: Array<Array<string>> = [];
-  if (selectedQuestion.entries) {
-    selectedQuestion.entries.map((entry) => {
+  if (selectedQuestion.question.entries) {
+    selectedQuestion.question.entries.map((entry) => {
       let variants: Array<string> = [];
       const location = `${entry.location}, ${entry.PLZ}`;
       entry.answers.map((answer) => {
@@ -51,7 +77,7 @@ const TableComponent = (
   }
   return (
     <Table
-      headerTitle={selectedQuestion.name}
+      headerTitle={selectedQuestion.question.name}
       headerDesc={'Beispielbeschreibung'}
       tableHeads={tableHeads}
       tableContent={tableContent}
@@ -65,12 +91,13 @@ const MapComponent = (
 ) => {
   const selected = useSelection();
   const selectedQuestion = useSelectedQuestion();
+
   return (
     <Map
       mapLayer={selected.value as string}
       showDialect={showDialects}
-      usedColors={usedColors[selectedQuestion.value as number].colors}
-      selectedQuestion={selectedQuestion}
+      usedColors={usedColors[selectedQuestion.question.value as number].colors}
+      selectedQuestion={selectedQuestion.question}
     ></Map>
   );
 };
@@ -104,8 +131,22 @@ const DataDropdown = (
   return (
     <MapDropdown
       entries={questionData}
-      selected={selectedQuestion}
+      selected={selectedQuestion.question}
       setSelected={(val: dropDownEntry<evaluatedAnswer[]>) => setSelectedQ(val)}
+    ></MapDropdown>
+  );
+};
+
+const RegDropDown = (
+  regDropdown: Array<dropDownEntry<undefined>>,
+  selectedReg: dropDownEntry<undefined>,
+  setSelectedReg: (arg0: dropDownEntry<undefined>) => void
+) => {
+  return (
+    <MapDropdown
+      entries={regDropdown}
+      selected={selectedReg}
+      setSelected={(val: dropDownEntry<undefined>) => setSelectedReg(val)}
     ></MapDropdown>
   );
 };
@@ -124,6 +165,29 @@ export default function MapAnalysis({
     { name: 'Bundesländer GeoJSON', value: 'geojson' },
   ];
 
+  const regDropdown: Array<dropDownEntry<undefined>> = [
+    {
+      name: 'Alle anzeigen',
+      value: '',
+    },
+    {
+      name: 'Dialekt (Mundart)',
+      value: 'dia',
+    },
+    {
+      name: 'Ihr Hochdeutsch',
+      value: 'hd',
+    },
+    {
+      name: 'Ihr österreichisches Hochdeutsch',
+      value: 'oehd',
+    },
+    {
+      name: 'bestes Hochdeutsch',
+      value: 'bhd',
+    },
+  ];
+
   const [selected, setSelected] = useState(
     layerEntries && layerEntries.length > 0
       ? layerEntries[0]
@@ -133,9 +197,16 @@ export default function MapAnalysis({
   const [selectedQ, setSelectedQ] = useState<dropDownEntry<evaluatedAnswer[]>>(
     questionData[0]
   );
+
+  const [selectedReg, setSelectedReg] = useState<dropDownEntry<undefined>>(
+    regDropdown[0]
+  );
+
   const [showDialects, setShowDialects] = useState(false);
   return (
-    <SelectedQuestion.Provider value={selectedQ}>
+    <SelectedQuestion.Provider
+      value={{ question: selectedQ, selectedReg: selectedReg }}
+    >
       <SelectedContext.Provider value={selected}>
         <WorkBox
           Element={() => MapComponent(showDialects, usedColors)}
@@ -143,6 +214,7 @@ export default function MapAnalysis({
             () => Dropdown(layerEntries, setSelected),
             () => Checkbox(setShowDialects),
             () => DataDropdown(questionData, setSelectedQ),
+            () => RegDropDown(regDropdown, selectedReg, setSelectedReg),
           ]}
         ></WorkBox>
         <div className='mt-10'>
