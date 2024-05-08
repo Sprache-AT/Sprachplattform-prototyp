@@ -14,7 +14,11 @@ export default function CircleMarkDiagram({ data }: CircleMarkDiagramProps) {
   return (
     <>
       {data.map((loc, idx) => {
-        if (loc.geometry.coordinates && loc.geometry.coordinates.length === 2) {
+        if (
+          loc.answers.length > 0 &&
+          loc.geometry.coordinates &&
+          loc.geometry.coordinates.length === 2
+        ) {
           let data = groupByValues(loc.answers, 'id');
           data = data.sort((a, b) =>
             b.v - a.v && a.id === 'Sonstiges' ? 1 : -1
