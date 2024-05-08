@@ -27,7 +27,6 @@ export default function Map({
   const [zoom, setZoom] = useState(7);
   const position: LatLngExpression = [47.5939, 14.1245];
   const dataList: question = data as question;
-
   return (
     <MapContainer
       maxZoom={10}
