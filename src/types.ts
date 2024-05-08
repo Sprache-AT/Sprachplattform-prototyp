@@ -34,6 +34,7 @@ export interface circleDiagramData {
   c: string;
   // Identifier
   id: string;
+  reg: string;
 }
 
 export interface answerCount extends circleDiagramData {
