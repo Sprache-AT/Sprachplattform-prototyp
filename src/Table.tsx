@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { FaSort, FaSortDown, FaSortUp } from 'react-icons/fa6';
 
 interface MapProps {
