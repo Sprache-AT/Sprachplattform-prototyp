@@ -26,7 +26,6 @@ export default function Table({
       if (ascending === false) {
         setSortIdx(undefined);
         setSortAscending(undefined);
-        console.log(ascending);
         tableContent = originalContent;
         return 0;
       }
@@ -79,11 +78,12 @@ export default function Table({
               key={`row-${index}`}
               className='bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-60'
             >
-              {row.map((cell, idx) => (
-                <td key={`cell-${index}-${idx}`} className='px-6 py-4'>
-                  {cell}
-                </td>
-              ))}
+              {row.length === tableHeads.length &&
+                row.map((cell, idx) => (
+                  <td key={`cell-${index}-${idx}`} className='px-6 py-4'>
+                    {cell}
+                  </td>
+                ))}
             </tr>
           ))}
         </tbody>
