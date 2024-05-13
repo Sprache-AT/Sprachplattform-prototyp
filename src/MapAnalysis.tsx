@@ -190,6 +190,29 @@ export default function MapAnalysis({
       name: 'bestes Hochdeutsch',
       value: 'bhd',
     },
+    {
+      name: 'Umgangssprache oder Alltagssprache',
+      value: 'usas',
+    },
+  ];
+
+  const variationDropdown: Array<dropDownEntry<undefined>> = [
+    {
+      name: 'Alle anzeigen',
+      value: '',
+    },
+    {
+      name: 'Register Dialekt',
+      value: 'dia',
+    },
+    {
+      name: 'Register Standard',
+      value: 'st',
+    },
+    {
+      name: 'Sonstige',
+      value: 'sons',
+    },
   ];
 
   const [selected, setSelected] = useState(
