@@ -21,7 +21,7 @@ export default function WorkBox({
   return (
     <>
       <div className='bg-gray-500 rounded-md p-5'>
-        <div className='flex flex-row sm:flex-col mb-5'>
+        <div className='flex flex-row xs:flex-col mb-5'>
           <div
             className={`basis-5/6 flex justify-items-center items-center space-x-5 justify-start`}
           >
