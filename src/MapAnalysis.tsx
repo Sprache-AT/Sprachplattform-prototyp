@@ -8,10 +8,34 @@ import CheckboxComp from './CheckboxComp';
 import 'leaflet/dist/leaflet.css';
 import Table from './Table';
 
+/*
+const register = 
+[
+  {name: 'dia', values: ['Dialekt (Mundart)', 'Umgangssprache oder Alltagssprache'],
+  {name: 'st', values: ['Ihr Hochdeutsch', 'bestes Hochdeutsch', 'Ihr österreichisches Hochdeutsch']
+  },
+];*/
+
+const register = [
+  {
+    name: 'dia',
+    values: ['Dialekt (Mundart)', 'Umgangssprache oder Alltagssprache'],
+  },
+  {
+    name: 'st',
+    values: [
+      'Ihr Hochdeutsch',
+      'bestes Hochdeutsch',
+      'Ihr österreichisches Hochdeutsch',
+    ],
+  },
+];
+
 const SelectedContext = createContext<dropDownEntry<undefined> | null>(null);
 const SelectedQuestion = createContext<{
   question: dropDownEntry<evaluatedAnswer[]>;
   selectedReg: dropDownEntry<undefined>;
+  selectedVar: dropDownEntry<undefined>;
 } | null>(null);
 
 function useSelection() {
@@ -30,10 +54,15 @@ function useSelectedQuestion() {
     );
   }
   let entries = context.question.entries;
-  if (context.selectedReg.value !== '') {
+  if (context.selectedReg.value !== '' && context.selectedVar.value === '') {
     entries = filterQuestionByReg(context.question, context.selectedReg.name);
+  } else if (context.selectedVar.value !== '') {
+    context.selectedReg.value = '';
+    entries = filterQuestionByVar(
+      context.question,
+      context.selectedVar.value as string
+    );
   }
-
   return {
     question: {
       name: context.question.name,
@@ -41,13 +70,34 @@ function useSelectedQuestion() {
       entries: entries,
     },
     selectedReg: context.selectedReg,
+    selectedVar: context.selectedVar,
   };
+}
+
+function filterQuestionByVar(
+  question: dropDownEntry<evaluatedAnswer[]>,
+  reg: string
+): evaluatedAnswer[] {
+  if (question.entries) {
+    return question.entries.map((entry) => {
+      console.log(register);
+      const registryDescription = register.filter(
+        (variant) => variant.name === reg
+      )[0].values;
+      const res = entry.answers.filter((ans) =>
+        registryDescription.includes(ans.reg)
+      );
+      return { ...entry, answers: res };
+    });
+  }
+  return [];
 }
 
 function filterQuestionByReg(
   question: dropDownEntry<evaluatedAnswer[]>,
   reg: string
 ): evaluatedAnswer[] {
+  console.log(question);
   if (question.entries) {
     return question.entries.map((entry) => {
       const res = entry.answers.filter((ans) => ans.reg === reg);
@@ -155,6 +205,20 @@ const RegDropDown = (
   );
 };
 
+const VariationDropdown = (
+  varDropdown: Array<dropDownEntry<undefined>>,
+  selectedVar: dropDownEntry<undefined>,
+  setSelectedVar: (arg0: dropDownEntry<undefined>) => void
+) => {
+  return (
+    <MapDropdown
+      entries={varDropdown}
+      selected={selectedVar}
+      setSelected={(val: dropDownEntry<undefined>) => setSelectedVar(val)}
+    ></MapDropdown>
+  );
+};
+
 interface MapAnalysisProps {
   usedColors: Array<questionColors>;
   questionData: Array<dropDownEntry<evaluatedAnswer[]>>;
@@ -198,7 +262,7 @@ export default function MapAnalysis({
 
   const variationDropdown: Array<dropDownEntry<undefined>> = [
     {
-      name: 'Alle anzeigen',
+      name: 'Alle Register anzeigen',
       value: '',
     },
     {
@@ -229,10 +293,18 @@ export default function MapAnalysis({
     regDropdown[0]
   );
 
+  const [selectedVar, setSelectedVar] = useState<dropDownEntry<undefined>>(
+    variationDropdown[0]
+  );
+
   const [showDialects, setShowDialects] = useState(false);
   return (
     <SelectedQuestion.Provider
-      value={{ question: selectedQ, selectedReg: selectedReg }}
+      value={{
+        question: selectedQ,
+        selectedReg: selectedReg,
+        selectedVar: selectedVar,
+      }}
     >
       <SelectedContext.Provider value={selected}>
         <WorkBox
@@ -242,6 +314,8 @@ export default function MapAnalysis({
             () => Checkbox(showDialects, setShowDialects),
             () => DataDropdown(questionData, setSelectedQ),
             () => RegDropDown(regDropdown, selectedReg, setSelectedReg),
+            () =>
+              VariationDropdown(variationDropdown, selectedVar, setSelectedVar),
           ]}
         ></WorkBox>
         <div className='mt-10'>
