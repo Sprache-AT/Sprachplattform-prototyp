@@ -10,21 +10,75 @@ import { generateSingleColor, hslToHex } from './helper';
 // Answer Count contains the values (v) with a color (c) and an identifier (id) organized in an array
 // Is organized at a location level
 export const evaluateQuestion = (
-  data: question,
+  inputData: question,
   colors: Array<string>
 ): { data: Array<evaluatedAnswer>; colors: Map<string, string> } => {
   const res = [] as Array<evaluatedAnswer>;
+  const questionResults = [] as Array<evaluatedAnswer>;
   const colorMap = new Map<string, string>();
-  data.features.map((feat) => {
-    let singleLocation = evaluateSingleLocation(feat, colorMap, colors);
-    res.push({
+  inputData.features.map((feat) => {
+    // const singleLocation = evaluateSingleLocation(feat, colorMap, colors);
+    const resInputData = [] as Array<evaluatedAnswer>;
+    const singleLocation: answerCount[] = [];
+    feat.properties.map((prop) => {
+      prop.answers.map((ans) => {
+        const findIndx = singleLocation.findIndex(
+          (el) => el.id === ans.anno && el.reg === ans.reg
+        );
+        const anno = ans.anno;
+        if (findIndx !== -1) {
+          if (
+            feat.location === 'Lauterach' &&
+            feat.title === 'STREICHHOLZ' &&
+            ans.anno === 'Streichholz' &&
+            ans.reg === 'Ihr Hochdeutsch'
+          ) {
+            console.log(ans);
+            console.log(singleLocation[findIndx]);
+          }
+          singleLocation[findIndx].v += 1;
+        } else {
+          let colorFromMap = colorMap.get(anno);
+          if (!colorFromMap) {
+            // If it does not exist, generate a new color
+            // Generate Color as HSL and convert it to a Hex RGB String
+            // Check if there is a color in the existing colors
+            if (colors.length > 0) {
+              // We know that there is a color in the array
+              colorFromMap = colors.pop() as string;
+            } else {
+              const hslColor = generateSingleColor(null);
+              colorFromMap = hslToHex(
+                hslColor.h,
+                hslColor.s * 100,
+                hslColor.l * 100
+              );
+            }
+            // Add it to the map for later use
+            colorMap.set(anno, colorFromMap);
+          }
+          singleLocation.push({
+            v: 1,
+            c: colorFromMap,
+            id: ans.anno,
+            answer: ans.answer,
+            reg: ans.reg,
+          });
+        }
+      });
+      if (feat.location === 'Lauterach' && feat.title === 'STREICHHOLZ') {
+        console.log(singleLocation);
+      }
+    });
+    questionResults.push({
       location: feat.location,
       PLZ: feat.PLZ,
       answers: singleLocation,
       geometry: feat.geometry,
     });
+    //res.push(...resInputData);
   });
-  return { data: res, colors: colorMap };
+  return { data: questionResults, colors: colorMap };
 };
 
 const evaluateSingleLocation = (
@@ -39,7 +93,7 @@ const evaluateSingleLocation = (
       // Check if anno contains more than one answer => has a comma?
       const annos = checkIfDouble(ans.anno);
       // Check if the answer is already in the result array
-      annos.forEach((elAnno) => {
+      annos.map((elAnno) => {
         const found = res.find((el) => el.id === elAnno && el.reg === ans.reg);
         if (found) {
           // If the answer is already in the array, increase the value
@@ -81,6 +135,5 @@ const evaluateSingleLocation = (
 
 const checkIfDouble = (answer: string): string[] => {
   const results = answer.split(',').map((el) => el.trim());
-  if (answer.split(',').length > 1) return results;
-  return [answer];
+  return results;
 };
