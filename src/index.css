@@ -15,6 +15,7 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
 }
 
 a {
@@ -54,6 +55,54 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+
+article h3 {
+  @apply text-2xl mb-3
+}
+
+article h4 {
+  @apply text-xl mb-4
+}
+
+article ul {
+  @apply list-inside list-disc mb-6
+}
+
+article ol {
+  @apply mb-6
+}
+
+article ol li {
+  @apply italic ml-2 -indent-2 mb-2 leading-snug max-w-2xl
+}
+
+article p {
+  @apply mb-8 leading-snug
+}
+
+aside a, article a {
+  @apply cursor-pointer hover:underline
+}
+
+article figure {
+  @apply mb-6
+}
+
+article figcaption {
+  @apply text-center text-gray-500 text-sm
+}
+
+aside ol {
+  @apply list-inside
+}
+
+aside ol li {
+  @apply  ml-2 mb-2 last:mb-0 leading-snug
+}
+
+aside ol .sub {
+  @apply  text-sm pl-2
 }
 
 @media (prefers-color-scheme: light) {
