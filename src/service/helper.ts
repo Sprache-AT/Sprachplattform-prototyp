@@ -1,4 +1,4 @@
-import { circleDiagramData } from '../types';
+import { answerCount, circleDiagramData } from '../types';
 
 let colorid: number = 0;
 
