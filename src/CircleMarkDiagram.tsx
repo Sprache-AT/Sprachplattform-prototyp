@@ -3,7 +3,6 @@ import { evaluatedAnswer } from './types';
 import { determineSize, drawCircleDiagram } from './service/MapCompute';
 
 import L from 'leaflet';
-import { groupByValues } from './service/helper';
 import CircleIcon from './CircleIcon';
 
 type CircleMarkDiagramProps = {
@@ -21,7 +20,7 @@ export default function CircleMarkDiagram({
           loc.geometry.coordinates &&
           loc.geometry.coordinates.length === 2
         ) {
-          let data = groupByValues(loc.answers, 'id');
+          let data = loc.answers;
           data = data.sort((a, b) =>
             b.v - a.v && a.id === 'Sonstiges' ? 1 : -1
           );
