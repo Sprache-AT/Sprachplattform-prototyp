@@ -7,14 +7,7 @@ import CheckboxComp from './CheckboxComp';
 
 import 'leaflet/dist/leaflet.css';
 import Table from './Table';
-
-/*
-const register = 
-[
-  {name: 'dia', values: ['Dialekt (Mundart)', 'Umgangssprache oder Alltagssprache'],
-  {name: 'st', values: ['Ihr Hochdeutsch', 'bestes Hochdeutsch', 'Ihr österreichisches Hochdeutsch']
-  },
-];*/
+import { QuestionContext } from './App';
 
 const register = [
   {
@@ -37,6 +30,14 @@ const SelectedQuestion = createContext<{
   selectedReg: dropDownEntry<undefined>;
   selectedVar: dropDownEntry<undefined>;
 } | null>(null);
+
+function useQuestionContext() {
+  const context = useContext(QuestionContext);
+  if (context === null) {
+    throw new Error('useQuestionContext must be used within a QuestionContext');
+  }
+  return context;
+}
 
 function useSelection() {
   const context = useContext(SelectedContext);
@@ -112,10 +113,10 @@ const TableComponent = (
   const selectedQuestion = useSelectedQuestion();
   const tableContent: Array<Array<string | number>> = [];
   if (selectedQuestion.question.entries) {
-    selectedQuestion.question.entries.map((entry) => {
+    selectedQuestion.question.entries.forEach((entry) => {
       let variants: Array<string | number> = [];
       const location = `${entry.location}, ${entry.PLZ}`;
-      entry.answers.map((answer) => {
+      entry.answers.forEach((answer) => {
         const variant = answer.answer;
         const num = answer.v;
         const reg = answer.reg;
@@ -178,16 +179,20 @@ const Checkbox = (
 );
 
 const DataDropdown = (
-  questionData: dropDownEntry<evaluatedAnswer[]>[],
   setSelectedQ: (arg0: dropDownEntry<evaluatedAnswer[]>) => void
 ) => {
   const selectedQuestion = useSelectedQuestion();
+  const questionContext = useQuestionContext();
   return (
-    <MapDropdown
-      entries={questionData}
-      selected={selectedQuestion.question}
-      setSelected={(val: dropDownEntry<evaluatedAnswer[]>) => setSelectedQ(val)}
-    ></MapDropdown>
+    questionContext && (
+      <MapDropdown
+        entries={questionContext}
+        selected={selectedQuestion.question}
+        setSelected={(val: dropDownEntry<evaluatedAnswer[]>) =>
+          setSelectedQ(val)
+        }
+      ></MapDropdown>
+    )
   );
 };
 
@@ -221,13 +226,11 @@ const VariationDropdown = (
 
 interface MapAnalysisProps {
   usedColors: Array<questionColors>;
-  questionData: Array<dropDownEntry<evaluatedAnswer[]>>;
 }
 
-export default function MapAnalysis({
-  usedColors,
-  questionData,
-}: MapAnalysisProps) {
+export default function MapAnalysis({ usedColors }: MapAnalysisProps) {
+  const questionContext = useQuestionContext();
+
   const layerEntries: Array<dropDownEntry<undefined>> = [
     { name: 'OpenStreetMap Tileset', value: 'osm' },
     { name: 'Bundesländer GeoJSON', value: 'geojson' },
@@ -285,9 +288,9 @@ export default function MapAnalysis({
       : { name: '', value: '' }
   );
 
-  const [selectedQ, setSelectedQ] = useState<dropDownEntry<evaluatedAnswer[]>>(
-    questionData[0]
-  );
+  const [selectedQ, setSelectedQ] = useState<
+    dropDownEntry<evaluatedAnswer[]> | undefined
+  >(questionContext ? questionContext[0] : undefined);
 
   const [selectedReg, setSelectedReg] = useState<dropDownEntry<undefined>>(
     regDropdown[0]
@@ -301,7 +304,9 @@ export default function MapAnalysis({
   return (
     <SelectedQuestion.Provider
       value={{
-        question: selectedQ,
+        question: selectedQ
+          ? selectedQ
+          : ({} as dropDownEntry<evaluatedAnswer[]>),
         selectedReg: selectedReg,
         selectedVar: selectedVar,
       }}
@@ -312,7 +317,7 @@ export default function MapAnalysis({
           UiElements={[
             () => Dropdown(layerEntries, setSelected),
             () => Checkbox(showDialects, setShowDialects),
-            () => DataDropdown(questionData, setSelectedQ),
+            () => DataDropdown(setSelectedQ),
             () => RegDropDown(regDropdown, selectedReg, setSelectedReg),
             () =>
               VariationDropdown(variationDropdown, selectedVar, setSelectedVar),
