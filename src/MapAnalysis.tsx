@@ -80,7 +80,6 @@ function filterQuestionByVar(
 ): evaluatedAnswer[] {
   if (question.entries) {
     return question.entries.map((entry) => {
-      console.log(register);
       const registryDescription = register.filter(
         (variant) => variant.name === reg
       )[0].values;
@@ -97,7 +96,6 @@ function filterQuestionByReg(
   question: dropDownEntry<evaluatedAnswer[]>,
   reg: string
 ): evaluatedAnswer[] {
-  console.log(question);
   if (question.entries) {
     return question.entries.map((entry) => {
       const res = entry.answers.filter((ans) => ans.reg === reg);
@@ -108,21 +106,22 @@ function filterQuestionByReg(
 }
 
 const TableComponent = (
-  tableHeads: Array<{ title: string; isSortable: boolean }>
+  tableHeads: Array<{ title: string; isSortable: boolean }>,
+  registerName: string
 ) => {
   const selectedQuestion = useSelectedQuestion();
-  const tableContent: Array<Array<string>> = [];
+  const tableContent: Array<Array<string | number>> = [];
   if (selectedQuestion.question.entries) {
     selectedQuestion.question.entries.map((entry) => {
-      let variants: Array<string> = [];
+      let variants: Array<string | number> = [];
       const location = `${entry.location}, ${entry.PLZ}`;
       entry.answers.map((answer) => {
         const variant = answer.answer;
-        const num = answer.v.toString();
+        const num = answer.v;
         const reg = answer.reg;
         variants = [variant, num, reg];
+        tableContent.push([location, ...variants]);
       });
-      tableContent.push([location, ...variants]);
     });
   }
   return (
@@ -131,6 +130,7 @@ const TableComponent = (
       headerDesc={'Beispielbeschreibung'}
       tableHeads={tableHeads}
       tableContent={tableContent}
+      registerName={registerName}
     />
   );
 };
@@ -321,12 +321,19 @@ export default function MapAnalysis({
         <div className='mt-10'>
           <WorkBox
             Element={() =>
-              TableComponent([
-                { title: 'Ort', isSortable: true },
-                { title: 'Variante', isSortable: false },
-                { title: 'Anzahl', isSortable: true },
-                { title: 'Registerbezeichnung', isSortable: true },
-              ])
+              TableComponent(
+                [
+                  { title: 'Ort', isSortable: true },
+                  { title: 'Variante', isSortable: false },
+                  { title: 'Anzahl', isSortable: true },
+                  { title: 'Registerbezeichnung', isSortable: true },
+                ],
+                selectedReg.value === ''
+                  ? selectedVar.value === ''
+                    ? 'Alle Register'
+                    : selectedVar.name
+                  : selectedReg.name
+              )
             }
           ></WorkBox>
         </div>
