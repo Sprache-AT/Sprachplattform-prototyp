@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from 'react';
+import { createContext } from 'react';
 import './App.css';
 
 import MapAnalysis from './MapAnalysis.tsx';
@@ -44,7 +44,7 @@ function App() {
   const dataListFr3: question = dataFr3 as question;
   const dataList = [dataListFr41, dataListFr3];
 
-  let { calculatedData, colors } = initalizeData(dataList);
+  const { calculatedData, colors } = initalizeData(dataList);
 
   return (
     <>
