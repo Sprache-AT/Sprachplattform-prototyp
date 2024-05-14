@@ -9,76 +9,26 @@ import { generateSingleColor, hslToHex } from './helper';
 // Evaluate the question data and return an array of answerCount
 // Answer Count contains the values (v) with a color (c) and an identifier (id) organized in an array
 // Is organized at a location level
-export const evaluateQuestion = (
+export const countAnswersinQuestion = (
   inputData: question,
   colors: Array<string>
 ): { data: Array<evaluatedAnswer>; colors: Map<string, string> } => {
   const res = [] as Array<evaluatedAnswer>;
-  const questionResults = [] as Array<evaluatedAnswer>;
   const colorMap = new Map<string, string>();
-  inputData.features.map((feat) => {
-    // const singleLocation = evaluateSingleLocation(feat, colorMap, colors);
-    const resInputData = [] as Array<evaluatedAnswer>;
-    const singleLocation: answerCount[] = [];
-    feat.properties.map((prop) => {
-      prop.answers.map((ans) => {
-        const findIndx = singleLocation.findIndex(
-          (el) => el.id === ans.anno && el.reg === ans.reg
-        );
-        const anno = ans.anno;
-        if (findIndx !== -1) {
-          if (
-            feat.location === 'Lauterach' &&
-            feat.title === 'STREICHHOLZ' &&
-            ans.anno === 'Streichholz' &&
-            ans.reg === 'Ihr Hochdeutsch'
-          ) {
-            console.log(ans);
-            console.log(singleLocation[findIndx]);
-          }
-          singleLocation[findIndx].v += 1;
-        } else {
-          let colorFromMap = colorMap.get(anno);
-          if (!colorFromMap) {
-            // If it does not exist, generate a new color
-            // Generate Color as HSL and convert it to a Hex RGB String
-            // Check if there is a color in the existing colors
-            if (colors.length > 0) {
-              // We know that there is a color in the array
-              colorFromMap = colors.pop() as string;
-            } else {
-              const hslColor = generateSingleColor(null);
-              colorFromMap = hslToHex(
-                hslColor.h,
-                hslColor.s * 100,
-                hslColor.l * 100
-              );
-            }
-            // Add it to the map for later use
-            colorMap.set(anno, colorFromMap);
-          }
-          singleLocation.push({
-            v: 1,
-            c: colorFromMap,
-            id: ans.anno,
-            answer: ans.answer,
-            reg: ans.reg,
-          });
-        }
-      });
-      if (feat.location === 'Lauterach' && feat.title === 'STREICHHOLZ') {
-        console.log(singleLocation);
-      }
-    });
-    questionResults.push({
+  inputData.features.forEach((feat) => {
+    const singleLocation = evaluateSingleLocation(feat, colorMap, colors);
+    if (feat.location === 'Lauterach' && feat.title === 'STREICHHOLZ') {
+      console.log(singleLocation);
+    }
+    singleLocation.sort((a, b) => a.id.localeCompare(b.id));
+    res.push({
       location: feat.location,
       PLZ: feat.PLZ,
       answers: singleLocation,
       geometry: feat.geometry,
     });
-    //res.push(...resInputData);
   });
-  return { data: questionResults, colors: colorMap };
+  return { data: res, colors: colorMap };
 };
 
 const evaluateSingleLocation = (
