@@ -55,7 +55,7 @@ export const determineSize = (
       return i > 0 ? Math.pow(i, 0.5716) : 1; // Apparent Scaling by Flannery
     }
   }
-  return brackets.length;
+  return Math.pow(brackets.length, 0.5716);
 };
 
 export const drawCircleDiagram = (

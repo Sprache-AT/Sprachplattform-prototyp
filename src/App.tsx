@@ -11,60 +11,48 @@ import {
   question,
   questionColors,
 } from './types.ts';
-import { evaluateQuestion } from './service/EvaluateData.ts';
+import { countAnswersinQuestion } from './service/EvaluateData.ts';
 import WorkBox from './WorkBox.tsx';
 import Article from './Article.tsx';
 
-export const QuestionContext = createContext<Array<evaluatedAnswer> | null>(
-  null
-);
+export const QuestionContext = createContext<
+  dropDownEntry<evaluatedAnswer[]>[] | undefined
+>(undefined);
+
+function initalizeData(dataList: question[]) {
+  console.log('starting init');
+  const res: Array<dropDownEntry<evaluatedAnswer[]>> = [];
+  const questionColors = [] as Array<questionColors>;
+  const currColors: Array<string> = [];
+
+  dataList.forEach((content, idx) => {
+    const { data, colors } = countAnswersinQuestion(content, currColors);
+    questionColors.push({ qId: idx, colors: colors });
+    currColors.push(...colors.values());
+    res.push({
+      name: `Frage ${content.features[0].title}`,
+      value: idx,
+      entries: data,
+    });
+  });
+
+  return { calculatedData: res, colors: questionColors };
+}
 
 function App() {
   const dataListFr41: question = dataFr41 as question;
   const dataListFr3: question = dataFr3 as question;
   const dataList = [dataListFr41, dataListFr3];
 
-  const [evaluatedData, setEvaluatedData] =
-    useState<Array<evaluatedAnswer> | null>(null);
-  const [usedColors, setUsedColors] = useState<Array<questionColors>>();
-
-  const [questionData, setQuestionData] = useState<
-    Array<dropDownEntry<evaluatedAnswer[]>>
-  >([]);
-
-  useEffect(() => {
-    const res: Array<dropDownEntry<evaluatedAnswer[]>> = [];
-    const questionColors = [] as Array<questionColors>;
-    const currColors: Array<string> = [];
-
-    dataList.map((content, idx) => {
-      const { data, colors } = evaluateQuestion(content, currColors);
-      questionColors.push({ qId: idx, colors: colors });
-      currColors.push(...colors.values());
-      res.push({
-        name: `Frage ${content.features[0].title}`,
-        value: idx,
-        entries: data,
-      });
-      if (idx === 0) {
-        // Set the data for the first element with color
-        setEvaluatedData(data);
-      }
-    });
-    setUsedColors(questionColors);
-    setQuestionData(res);
-  }, []);
+  let { calculatedData, colors } = initalizeData(dataList);
 
   return (
     <>
       <div className='columns-1 pb-20'>
         <div>
-          <QuestionContext.Provider value={evaluatedData}>
-            {questionData.length > 0 && usedColors ? (
-              <MapAnalysis
-                questionData={questionData}
-                usedColors={usedColors}
-              ></MapAnalysis>
+          <QuestionContext.Provider value={calculatedData}>
+            {calculatedData.length > 0 && colors ? (
+              <MapAnalysis usedColors={colors}></MapAnalysis>
             ) : (
               'Loading...'
             )}

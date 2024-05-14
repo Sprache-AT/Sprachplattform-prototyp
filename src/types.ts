@@ -40,8 +40,6 @@ export interface circleDiagramData {
 export interface answerCount extends circleDiagramData {
   // answer String
   answer: string;
-  // Annotation
-  reg: string;
 }
 
 export type evaluatedAnswer = {

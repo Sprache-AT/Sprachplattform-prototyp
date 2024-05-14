@@ -9,14 +9,18 @@ import { generateSingleColor, hslToHex } from './helper';
 // Evaluate the question data and return an array of answerCount
 // Answer Count contains the values (v) with a color (c) and an identifier (id) organized in an array
 // Is organized at a location level
-export const evaluateQuestion = (
-  data: question,
+export const countAnswersinQuestion = (
+  inputData: question,
   colors: Array<string>
 ): { data: Array<evaluatedAnswer>; colors: Map<string, string> } => {
   const res = [] as Array<evaluatedAnswer>;
   const colorMap = new Map<string, string>();
-  data.features.map((feat) => {
-    let singleLocation = evaluateSingleLocation(feat, colorMap, colors);
+  inputData.features.forEach((feat) => {
+    const singleLocation = evaluateSingleLocation(feat, colorMap, colors);
+    if (feat.location === 'Lauterach' && feat.title === 'STREICHHOLZ') {
+      console.log(singleLocation);
+    }
+    singleLocation.sort((a, b) => a.id.localeCompare(b.id));
     res.push({
       location: feat.location,
       PLZ: feat.PLZ,
@@ -39,7 +43,7 @@ const evaluateSingleLocation = (
       // Check if anno contains more than one answer => has a comma?
       const annos = checkIfDouble(ans.anno);
       // Check if the answer is already in the result array
-      annos.forEach((elAnno) => {
+      annos.map((elAnno) => {
         const found = res.find((el) => el.id === elAnno && el.reg === ans.reg);
         if (found) {
           // If the answer is already in the array, increase the value
@@ -81,6 +85,5 @@ const evaluateSingleLocation = (
 
 const checkIfDouble = (answer: string): string[] => {
   const results = answer.split(',').map((el) => el.trim());
-  if (answer.split(',').length > 1) return results;
-  return [answer];
+  return results;
 };

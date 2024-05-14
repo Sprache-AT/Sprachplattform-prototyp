@@ -1,9 +1,8 @@
 import { Marker, Popup } from 'react-leaflet';
 import { evaluatedAnswer } from './types';
-import { drawCircleDiagram } from './service/MapCompute';
+import { determineSize, drawCircleDiagram } from './service/MapCompute';
 
 import L from 'leaflet';
-import { groupByValues } from './service/helper';
 import CircleIcon from './CircleIcon';
 
 type CircleMarkDiagramProps = {
@@ -21,15 +20,21 @@ export default function CircleMarkDiagram({
           loc.geometry.coordinates &&
           loc.geometry.coordinates.length === 2
         ) {
-          let data = groupByValues(loc.answers, 'id');
+          let data = loc.answers;
           data = data.sort((a, b) =>
             b.v - a.v && a.id === 'Sonstiges' ? 1 : -1
           );
+          const size = loc.answers.reduce((a, b) => a + b.v, 0);
           const icon: L.DivIcon = L.divIcon({
             iconSize: [30, 30],
             className: 'marker',
             html: drawCircleDiagram(
-              30,
+              20 *
+                determineSize(
+                  size,
+                  [0, 1, 5, 10, 20, 30, 40, 100] // Adapt the current brackets to the current data
+                  // 0-1, 2-9, 10-19, 20-99, 100+
+                ),
               1,
               '#000',
               loc.answers[0].c,

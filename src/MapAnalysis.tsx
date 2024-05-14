@@ -7,12 +7,37 @@ import CheckboxComp from './CheckboxComp';
 
 import 'leaflet/dist/leaflet.css';
 import Table from './Table';
+import { QuestionContext } from './App';
+
+const register = [
+  {
+    name: 'dia',
+    values: ['Dialekt (Mundart)', 'Umgangssprache oder Alltagssprache'],
+  },
+  {
+    name: 'st',
+    values: [
+      'Ihr Hochdeutsch',
+      'bestes Hochdeutsch',
+      'Ihr österreichisches Hochdeutsch',
+    ],
+  },
+];
 
 const SelectedContext = createContext<dropDownEntry<undefined> | null>(null);
 const SelectedQuestion = createContext<{
   question: dropDownEntry<evaluatedAnswer[]>;
   selectedReg: dropDownEntry<undefined>;
+  selectedVar: dropDownEntry<undefined>;
 } | null>(null);
+
+function useQuestionContext() {
+  const context = useContext(QuestionContext);
+  if (context === null) {
+    throw new Error('useQuestionContext must be used within a QuestionContext');
+  }
+  return context;
+}
 
 function useSelection() {
   const context = useContext(SelectedContext);
@@ -30,10 +55,15 @@ function useSelectedQuestion() {
     );
   }
   let entries = context.question.entries;
-  if (context.selectedReg.value !== '') {
+  if (context.selectedReg.value !== '' && context.selectedVar.value === '') {
     entries = filterQuestionByReg(context.question, context.selectedReg.name);
+  } else if (context.selectedVar.value !== '') {
+    context.selectedReg.value = '';
+    entries = filterQuestionByVar(
+      context.question,
+      context.selectedVar.value as string
+    );
   }
-
   return {
     question: {
       name: context.question.name,
@@ -41,7 +71,26 @@ function useSelectedQuestion() {
       entries: entries,
     },
     selectedReg: context.selectedReg,
+    selectedVar: context.selectedVar,
   };
+}
+
+function filterQuestionByVar(
+  question: dropDownEntry<evaluatedAnswer[]>,
+  reg: string
+): evaluatedAnswer[] {
+  if (question.entries) {
+    return question.entries.map((entry) => {
+      const registryDescription = register.filter(
+        (variant) => variant.name === reg
+      )[0].values;
+      const res = entry.answers.filter((ans) =>
+        registryDescription.includes(ans.reg)
+      );
+      return { ...entry, answers: res };
+    });
+  }
+  return [];
 }
 
 function filterQuestionByReg(
@@ -58,21 +107,22 @@ function filterQuestionByReg(
 }
 
 const TableComponent = (
-  tableHeads: Array<{ title: string; isSortable: boolean }>
+  tableHeads: Array<{ title: string; isSortable: boolean }>,
+  registerName: string
 ) => {
   const selectedQuestion = useSelectedQuestion();
-  const tableContent: Array<Array<string>> = [];
+  const tableContent: Array<Array<string | number>> = [];
   if (selectedQuestion.question.entries) {
-    selectedQuestion.question.entries.map((entry) => {
-      let variants: Array<string> = [];
+    selectedQuestion.question.entries.forEach((entry) => {
+      let variants: Array<string | number> = [];
       const location = `${entry.location}, ${entry.PLZ}`;
-      entry.answers.map((answer) => {
+      entry.answers.forEach((answer) => {
         const variant = answer.answer;
-        const num = answer.v.toString();
+        const num = answer.v;
         const reg = answer.reg;
         variants = [variant, num, reg];
+        tableContent.push([location, ...variants]);
       });
-      tableContent.push([location, ...variants]);
     });
   }
   return (
@@ -81,6 +131,7 @@ const TableComponent = (
       headerDesc={'Beispielbeschreibung'}
       tableHeads={tableHeads}
       tableContent={tableContent}
+      registerName={registerName}
     />
   );
 };
@@ -128,16 +179,20 @@ const Checkbox = (
 );
 
 const DataDropdown = (
-  questionData: dropDownEntry<evaluatedAnswer[]>[],
   setSelectedQ: (arg0: dropDownEntry<evaluatedAnswer[]>) => void
 ) => {
   const selectedQuestion = useSelectedQuestion();
+  const questionContext = useQuestionContext();
   return (
-    <MapDropdown
-      entries={questionData}
-      selected={selectedQuestion.question}
-      setSelected={(val: dropDownEntry<evaluatedAnswer[]>) => setSelectedQ(val)}
-    ></MapDropdown>
+    questionContext && (
+      <MapDropdown
+        entries={questionContext}
+        selected={selectedQuestion.question}
+        setSelected={(val: dropDownEntry<evaluatedAnswer[]>) =>
+          setSelectedQ(val)
+        }
+      ></MapDropdown>
+    )
   );
 };
 
@@ -155,15 +210,27 @@ const RegDropDown = (
   );
 };
 
+const VariationDropdown = (
+  varDropdown: Array<dropDownEntry<undefined>>,
+  selectedVar: dropDownEntry<undefined>,
+  setSelectedVar: (arg0: dropDownEntry<undefined>) => void
+) => {
+  return (
+    <MapDropdown
+      entries={varDropdown}
+      selected={selectedVar}
+      setSelected={(val: dropDownEntry<undefined>) => setSelectedVar(val)}
+    ></MapDropdown>
+  );
+};
+
 interface MapAnalysisProps {
   usedColors: Array<questionColors>;
-  questionData: Array<dropDownEntry<evaluatedAnswer[]>>;
 }
 
-export default function MapAnalysis({
-  usedColors,
-  questionData,
-}: MapAnalysisProps) {
+export default function MapAnalysis({ usedColors }: MapAnalysisProps) {
+  const questionContext = useQuestionContext();
+
   const layerEntries: Array<dropDownEntry<undefined>> = [
     { name: 'OpenStreetMap Tileset', value: 'osm' },
     { name: 'Bundesländer GeoJSON', value: 'geojson' },
@@ -190,6 +257,29 @@ export default function MapAnalysis({
       name: 'bestes Hochdeutsch',
       value: 'bhd',
     },
+    {
+      name: 'Umgangssprache oder Alltagssprache',
+      value: 'usas',
+    },
+  ];
+
+  const variationDropdown: Array<dropDownEntry<undefined>> = [
+    {
+      name: 'Alle Register anzeigen',
+      value: '',
+    },
+    {
+      name: 'Register Dialekt',
+      value: 'dia',
+    },
+    {
+      name: 'Register Standard',
+      value: 'st',
+    },
+    {
+      name: 'Sonstige',
+      value: 'sons',
+    },
   ];
 
   const [selected, setSelected] = useState(
@@ -198,18 +288,28 @@ export default function MapAnalysis({
       : { name: '', value: '' }
   );
 
-  const [selectedQ, setSelectedQ] = useState<dropDownEntry<evaluatedAnswer[]>>(
-    questionData[0]
-  );
+  const [selectedQ, setSelectedQ] = useState<
+    dropDownEntry<evaluatedAnswer[]> | undefined
+  >(questionContext ? questionContext[0] : undefined);
 
   const [selectedReg, setSelectedReg] = useState<dropDownEntry<undefined>>(
     regDropdown[0]
   );
 
+  const [selectedVar, setSelectedVar] = useState<dropDownEntry<undefined>>(
+    variationDropdown[0]
+  );
+
   const [showDialects, setShowDialects] = useState(false);
   return (
     <SelectedQuestion.Provider
-      value={{ question: selectedQ, selectedReg: selectedReg }}
+      value={{
+        question: selectedQ
+          ? selectedQ
+          : ({} as dropDownEntry<evaluatedAnswer[]>),
+        selectedReg: selectedReg,
+        selectedVar: selectedVar,
+      }}
     >
       <SelectedContext.Provider value={selected}>
         <WorkBox
@@ -217,19 +317,28 @@ export default function MapAnalysis({
           UiElements={[
             () => Dropdown(layerEntries, setSelected),
             () => Checkbox(showDialects, setShowDialects),
-            () => DataDropdown(questionData, setSelectedQ),
+            () => DataDropdown(setSelectedQ),
             () => RegDropDown(regDropdown, selectedReg, setSelectedReg),
+            () =>
+              VariationDropdown(variationDropdown, selectedVar, setSelectedVar),
           ]}
         ></WorkBox>
         <div className='mt-10'>
           <WorkBox
             Element={() =>
-              TableComponent([
-                { title: 'Ort', isSortable: true },
-                { title: 'Variante', isSortable: false },
-                { title: 'Anzahl', isSortable: true },
-                { title: 'Registerbezeichnung', isSortable: true },
-              ])
+              TableComponent(
+                [
+                  { title: 'Ort', isSortable: true },
+                  { title: 'Variante', isSortable: false },
+                  { title: 'Anzahl', isSortable: true },
+                  { title: 'Registerbezeichnung', isSortable: true },
+                ],
+                selectedReg.value === ''
+                  ? selectedVar.value === ''
+                    ? 'Alle Register'
+                    : selectedVar.name
+                  : selectedReg.name
+              )
             }
           ></WorkBox>
         </div>

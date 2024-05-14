@@ -5,7 +5,8 @@ interface MapProps {
   headerTitle: string;
   headerDesc: string;
   tableHeads: Array<{ title: string; isSortable: boolean }>;
-  tableContent: Array<Array<string>>;
+  tableContent: Array<Array<string | number>>;
+  registerName: string;
 }
 
 export default function Table({
@@ -13,12 +14,13 @@ export default function Table({
   headerDesc,
   tableHeads,
   tableContent,
+  registerName,
 }: MapProps) {
   const [sortAscending, setSortAscending] = useState<boolean | undefined>(
     undefined
   );
   const [sortIdx, setSortIdx] = useState<number | undefined>(undefined);
-  const originalContent: Array<Array<string>> = tableContent;
+  const originalContent: Array<Array<string | number>> = tableContent;
 
   function sortTable(idx: number, ascending: boolean | undefined) {
     tableContent = tableContent.sort((a, b) => {
@@ -27,14 +29,26 @@ export default function Table({
         setSortIdx(undefined);
         setSortAscending(undefined);
         tableContent = originalContent;
-        return 0;
+        return -1;
+      }
+      if (Number.isInteger(a[idx])) {
+        if (ascending) {
+          setSortAscending(false);
+          return a[idx] < b[idx] ? -1 : 1;
+        }
+        setSortAscending(true);
+        return a[idx] > b[idx] ? -1 : 1;
       }
       if (ascending) {
         setSortAscending(false);
-        return a[idx].toLowerCase() < b[idx].toLowerCase() ? -1 : 1;
+        return a[idx].toString().toLowerCase() < b[idx].toString().toLowerCase()
+          ? -1
+          : 1;
       }
       setSortAscending(true);
-      return a[idx].toLowerCase() > b[idx].toLowerCase() ? -1 : 1;
+      return a[idx].toString().toLowerCase() > b[idx].toString().toLowerCase()
+        ? -1
+        : 1;
     });
   }
 
@@ -87,6 +101,20 @@ export default function Table({
             </tr>
           ))}
         </tbody>
+        <tfoot className='sticky bottom-0 font-semibold text-gray-900  bg-gray-50 dark:bg-gray-700 dark:text-gray-400'>
+          <tr>
+            <th colSpan={2} scope='row' className='px-6 py-3 text-base'>
+              Summe
+            </th>
+            <td>
+              {tableContent.reduce((prev, curr) => {
+                const num = curr[2] as number;
+                return prev + (isNaN(num) ? 0 : num);
+              }, 0)}
+            </td>
+            <td>{registerName}</td>
+          </tr>
+        </tfoot>
       </table>
     </div>
   );
