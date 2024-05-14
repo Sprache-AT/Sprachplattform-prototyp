@@ -13,7 +13,7 @@ import {
 } from './types.ts';
 import { evaluateQuestion } from './service/EvaluateData.ts';
 import WorkBox from './WorkBox.tsx';
-import TextComponent from './TextComponent.tsx';
+import Article from './Article.tsx';
 
 export const QuestionContext = createContext<Array<evaluatedAnswer> | null>(
   null
@@ -57,7 +57,7 @@ function App() {
 
   return (
     <>
-      <div className='columns-1'>
+      <div className='columns-1 pb-20'>
         <div>
           <QuestionContext.Provider value={evaluatedData}>
             {questionData.length > 0 && usedColors ? (
@@ -71,7 +71,7 @@ function App() {
           </QuestionContext.Provider>
         </div>
         <div className='h-full mt-10'>
-          <WorkBox Element={() => <TextComponent text={'test123'} />} />
+          <WorkBox Element={() => <Article />} />
         </div>
       </div>
     </>
