@@ -191,7 +191,7 @@ const VariantTableComponent = (
   return (
     <Table
       headerTitle={selectedQuestion.question.name}
-      headerDesc={'Beispielbeschreibung'}
+      headerDesc={'Quantitative Analyse der Varianten'}
       tableHeads={tableHeads}
       tableContent={tableContent}
       registerName={registerName}
