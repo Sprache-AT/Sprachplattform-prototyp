@@ -7,6 +7,7 @@ interface MapProps {
   tableHeads: Array<{ title: string; isSortable: boolean }>;
   tableContent: Array<Array<string | number>>;
   registerName: string;
+  variants: boolean;
 }
 
 export default function Table({
@@ -15,6 +16,7 @@ export default function Table({
   tableHeads,
   tableContent,
   registerName,
+  variants,
 }: MapProps) {
   const [sortAscending, setSortAscending] = useState<boolean | undefined>(
     undefined
@@ -103,15 +105,31 @@ export default function Table({
         </tbody>
         <tfoot className='sticky bottom-0 font-semibold text-gray-900  bg-gray-50 dark:bg-gray-700 dark:text-gray-400'>
           <tr>
-            <th colSpan={2} scope='row' className='px-6 py-3 text-base'>
+            <th colSpan={variants ? 1 : 2} scope='row' className='px-6 py-3 text-base'>
               Summe
             </th>
+            { variants &&
+            <td>
+              {tableContent.reduce((prev, curr) => {
+                const num = curr[1] as number;
+                return prev + (isNaN(num) ? 0 : num);
+              }, 0)}
+            </td>
+             }
             <td>
               {tableContent.reduce((prev, curr) => {
                 const num = curr[2] as number;
                 return prev + (isNaN(num) ? 0 : num);
               }, 0)}
             </td>
+            { variants &&
+            <td>
+              {tableContent.reduce((prev, curr) => {
+                const num = curr[3] as number;
+                return prev + (isNaN(num) ? 0 : num);
+              }, 0)}
+            </td>
+            }
             <td>{registerName}</td>
           </tr>
         </tfoot>

@@ -9,6 +9,14 @@ import 'leaflet/dist/leaflet.css';
 import Table from './Table';
 import { QuestionContext } from './App';
 
+interface IVariant {
+  [key: string]: {
+    dia: number;
+    sta: number;
+    total: number;
+  }
+}
+
 const register = [
   {
     name: 'dia',
@@ -75,6 +83,23 @@ function useSelectedQuestion() {
   };
 }
 
+function useSelectedQuestionForVariants() {
+  const context = useContext(SelectedQuestion);
+  if (context === null) {
+    throw new Error(
+      'useSelectedQuestion must be used within a SelectedQuestion'
+    );
+  }
+  const entries = context.question.entries;
+  return {
+    question: {
+      name: context.question.name,
+      value: context.question.value,
+      entries: entries,
+    }
+  };
+}
+
 function filterQuestionByVar(
   question: dropDownEntry<evaluatedAnswer[]>,
   reg: string
@@ -132,6 +157,45 @@ const TableComponent = (
       tableHeads={tableHeads}
       tableContent={tableContent}
       registerName={registerName}
+      variants={false}
+    />
+  );
+};
+
+const VariantTableComponent = (
+  tableHeads: Array<{ title: string; isSortable: boolean }>,
+  registerName: string
+) => {
+  const selectedQuestion = useSelectedQuestionForVariants();
+  const tableContent: Array<Array<string | number>> = [];
+  const variants: IVariant = {}
+  if (selectedQuestion.question.entries) {
+    selectedQuestion.question.entries.forEach((entry) => {
+      entry.answers.forEach((answer) => {
+        if (!variants[answer.id]) {
+          variants[answer.id] = {dia:0, sta:0 , total:0}
+        }
+        if(register[0].values.includes(answer.reg)) {
+          variants[answer.id].dia += answer.v
+        }
+        else if(register[1].values.includes(answer.reg)) {
+          variants[answer.id].sta += answer.v
+        }
+        variants[answer.id].total += answer.v
+      });
+    });
+    for (const [key, value] of Object.entries(variants)) {
+      tableContent.push([key, value.dia, value.sta, value.total])
+    }
+  }
+  return (
+    <Table
+      headerTitle={selectedQuestion.question.name}
+      headerDesc={'Quantitative Analyse der Varianten'}
+      tableHeads={tableHeads}
+      tableContent={tableContent}
+      registerName={registerName}
+      variants={true}
     />
   );
 };
@@ -338,6 +402,21 @@ export default function MapAnalysis({ usedColors }: MapAnalysisProps) {
                     ? 'Alle Register'
                     : selectedVar.name
                   : selectedReg.name
+              )
+            }
+          ></WorkBox>
+        </div>
+        <div className='mt-10'>
+          <WorkBox
+            Element={() =>
+              VariantTableComponent(
+                [
+                  { title: 'Variante', isSortable: true },
+                  { title: 'Dialekt+UG', isSortable: true },
+                  { title: 'Standard', isSortable: true },
+                  { title: 'Gesamt', isSortable: true },
+                ],
+                ''
               )
             }
           ></WorkBox>
