@@ -10,6 +10,8 @@ import Table from './Table';
 import { QuestionContext } from './App';
 import DropdownMultiple from './DropdownMultiple';
 
+import Select from 'react-select';
+
 interface IVariant {
   [key: string]: {
     dia: number;
@@ -284,6 +286,39 @@ const DataDropdown = (
   );
 };
 
+const DropdownMultipleSelect = (
+  entries: Array<questionColors>,
+  selected: dropDownEntry<undefined>[],
+  setSelectedVar: (arg0: dropDownEntry<undefined>[]) => void
+) => {
+  const selectedQuestion = useSelectedQuestion();
+  const selectedColor =
+    entries[selectedQuestion.question.value as number].colors;
+  const colorKeyArray = Array.from(selectedColor.keys());
+  const dropDownValues = colorKeyArray.map((colors) => {
+    return { name: colors, value: colors };
+  }) as Array<dropDownEntry<undefined>>;
+  return (
+    <Select
+      isMulti
+      name='Antworten'
+      value={selected}
+      options={dropDownValues}
+      className='basic-multi-select'
+      classNamePrefix='select'
+      getOptionLabel={(option) => option.name}
+      getOptionValue={(option) => option.value as string}
+      onChange={(id) => {
+        const res = [] as dropDownEntry<undefined>[];
+        id.map((el) => {
+          res.push({ name: el.name, value: el.value });
+        });
+        setSelectedVar(res);
+      }}
+    />
+  );
+};
+
 const RegDropDown = (
   regDropdown: Array<dropDownEntry<undefined>>,
   selectedReg: dropDownEntry<undefined>,
@@ -434,7 +469,12 @@ export default function MapAnalysis({ usedColors }: MapAnalysisProps) {
             () => RegDropDown(regDropdown, selectedReg, setSelectedReg),
             () =>
               VariationDropdown(variationDropdown, selectedVar, setSelectedVar),
-            () => AnswerDropdown(usedColors, selectedAnswer, setSelectedAnswer),
+            () =>
+              DropdownMultipleSelect(
+                usedColors,
+                selectedAnswer,
+                setSelectedAnswer
+              ),
           ]}
         ></WorkBox>
         <div className='mt-10'>
