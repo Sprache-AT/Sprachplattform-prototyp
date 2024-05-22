@@ -14,6 +14,11 @@ import {
 import { countAnswersinQuestion } from './service/EvaluateData.ts';
 import WorkBox from './WorkBox.tsx';
 import Article from './Article.tsx';
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from '@tanstack/react-query';
 
 export const QuestionContext = createContext<
   dropDownEntry<evaluatedAnswer[]>[] | undefined
@@ -40,27 +45,49 @@ function initalizeData(dataList: question[]) {
 }
 
 function App() {
-  const dataListFr41: question = dataFr41 as question;
-  const dataListFr3: question = dataFr3 as question;
-  const dataList = [dataListFr41, dataListFr3];
+  const { isLoading, error, data } = useQuery({
+    queryKey: ['data'],
+    queryFn: async () => {
+      const dataListFr41 = await fetch('./src/data/fr41.json').then((res) =>
+        res.json()
+      );
+      const dataListFr3 = await fetch('./src/data/fr3.json').then((res) =>
+        res.json()
+      );
+      const dataList = [dataListFr41, dataListFr3];
+      return initalizeData(dataList);
+    },
+  });
 
-  const { calculatedData, colors } = initalizeData(dataList);
+  // const { calculatedData, colors } = initalizeData(dataList);
+
+  if (error) {
+    return <>Ein Fehler ist aufgetreten: {error.message}</>;
+  }
 
   return (
     <>
       <div className='columns-1 pb-20'>
-        <div>
-          <QuestionContext.Provider value={calculatedData}>
-            {calculatedData.length > 0 && colors ? (
-              <MapAnalysis usedColors={colors}></MapAnalysis>
-            ) : (
-              'Loading...'
-            )}
-          </QuestionContext.Provider>
-        </div>
-        <div className='h-full mt-10'>
-          <WorkBox Element={() => <Article />} />
-        </div>
+        {isLoading ? (
+          'Loading...'
+        ) : data && data.calculatedData.length > 0 && data.colors ? (
+          <div>
+            <div>
+              <QuestionContext.Provider value={data.calculatedData}>
+                {data.calculatedData.length > 0 && data.colors ? (
+                  <MapAnalysis usedColors={data.colors}></MapAnalysis>
+                ) : (
+                  'Data does not contain any results...'
+                )}
+              </QuestionContext.Provider>
+            </div>
+            <div className='h-full mt-10'>
+              <WorkBox Element={() => <Article />} />
+            </div>
+          </div>
+        ) : (
+          'Ein Fehler ist aufgetreten bitte neu laden...'
+        )}
       </div>
     </>
   );
