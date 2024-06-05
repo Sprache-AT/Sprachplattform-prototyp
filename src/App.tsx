@@ -44,7 +44,7 @@ function App() {
     queryFn: async () => {
       const dataList = [];
       for (var i = 1; i < 46; i++) {
-        const curr_question = await fetch(`./src/data/fr${i}.json`).then(
+        const curr_question = await fetch(`./assets/data/fr${i}.json`).then(
           (res) => res.json()
         );
         dataList.push(curr_question);
