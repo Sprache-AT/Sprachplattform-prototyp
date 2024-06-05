@@ -43,8 +43,8 @@ export default function CircleMarkDiagram({
             ),
           });
           const position: L.LatLngExpression = [
-            loc.geometry.coordinates[0],
             loc.geometry.coordinates[1],
+            loc.geometry.coordinates[0],
           ];
           return (
             <Marker key={`marker-${idx}`} icon={icon} position={position}>

@@ -1,5 +1,10 @@
 import { createContext, useContext, useState } from 'react';
-import { dropDownEntry, evaluatedAnswer, questionColors } from './types';
+import {
+  colors,
+  dropDownEntry,
+  evaluatedAnswer,
+  questionColors,
+} from './types';
 import WorkBox from './WorkBox';
 import Map from './Map';
 import MapDropdown from './MapDropdown';
@@ -8,13 +13,16 @@ import CheckboxComp from './CheckboxComp';
 import 'leaflet/dist/leaflet.css';
 import Table from './Table';
 import { QuestionContext } from './App';
+import DropdownMultiple from './DropdownMultiple';
+
+import Select from 'react-select';
 
 interface IVariant {
   [key: string]: {
     dia: number;
     sta: number;
     total: number;
-  }
+  };
 }
 
 const register = [
@@ -37,6 +45,7 @@ const SelectedQuestion = createContext<{
   question: dropDownEntry<evaluatedAnswer[]>;
   selectedReg: dropDownEntry<undefined>;
   selectedVar: dropDownEntry<undefined>;
+  selectedAnswer: dropDownEntry<undefined>[];
 } | null>(null);
 
 function useQuestionContext() {
@@ -63,6 +72,7 @@ function useSelectedQuestion() {
     );
   }
   let entries = context.question.entries;
+
   if (context.selectedReg.value !== '' && context.selectedVar.value === '') {
     entries = filterQuestionByReg(context.question, context.selectedReg.name);
   } else if (context.selectedVar.value !== '') {
@@ -70,6 +80,11 @@ function useSelectedQuestion() {
     entries = filterQuestionByVar(
       context.question,
       context.selectedVar.value as string
+    );
+  } else if (context.selectedAnswer.length > 0) {
+    entries = filterQuestionByAnswer(
+      context.question,
+      context.selectedAnswer.map((el) => el.value) as string[]
     );
   }
   return {
@@ -80,6 +95,7 @@ function useSelectedQuestion() {
     },
     selectedReg: context.selectedReg,
     selectedVar: context.selectedVar,
+    selectedAnswer: context.selectedAnswer,
   };
 }
 
@@ -96,7 +112,7 @@ function useSelectedQuestionForVariants() {
       name: context.question.name,
       value: context.question.value,
       entries: entries,
-    }
+    },
   };
 }
 
@@ -125,6 +141,19 @@ function filterQuestionByReg(
   if (question.entries) {
     return question.entries.map((entry) => {
       const res = entry.answers.filter((ans) => ans.reg === reg);
+      return { ...entry, answers: res };
+    });
+  }
+  return [];
+}
+
+function filterQuestionByAnswer(
+  question: dropDownEntry<evaluatedAnswer[]>,
+  reg: string[]
+): evaluatedAnswer[] {
+  if (question.entries) {
+    return question.entries.map((entry) => {
+      const res = entry.answers.filter((ans) => reg.includes(ans.id));
       return { ...entry, answers: res };
     });
   }
@@ -168,24 +197,23 @@ const VariantTableComponent = (
 ) => {
   const selectedQuestion = useSelectedQuestionForVariants();
   const tableContent: Array<Array<string | number>> = [];
-  const variants: IVariant = {}
+  const variants: IVariant = {};
   if (selectedQuestion.question.entries) {
     selectedQuestion.question.entries.forEach((entry) => {
       entry.answers.forEach((answer) => {
         if (!variants[answer.id]) {
-          variants[answer.id] = {dia:0, sta:0 , total:0}
+          variants[answer.id] = { dia: 0, sta: 0, total: 0 };
         }
-        if(register[0].values.includes(answer.reg)) {
-          variants[answer.id].dia += answer.v
+        if (register[0].values.includes(answer.reg)) {
+          variants[answer.id].dia += answer.v;
+        } else if (register[1].values.includes(answer.reg)) {
+          variants[answer.id].sta += answer.v;
         }
-        else if(register[1].values.includes(answer.reg)) {
-          variants[answer.id].sta += answer.v
-        }
-        variants[answer.id].total += answer.v
+        variants[answer.id].total += answer.v;
       });
     });
     for (const [key, value] of Object.entries(variants)) {
-      tableContent.push([key, value.dia, value.sta, value.total])
+      tableContent.push([key, value.dia, value.sta, value.total]);
     }
   }
   return (
@@ -202,16 +230,28 @@ const VariantTableComponent = (
 
 const MapComponent = (
   showDialects: boolean,
-  usedColors: Array<questionColors>
+  usedColors: Array<questionColors>,
+  selectedAnswer: dropDownEntry<undefined>[]
 ) => {
   const selected = useSelection();
   const selectedQuestion = useSelectedQuestion();
 
+  let filteredColors =
+    usedColors[selectedQuestion.question.value as number].colors;
+  let mapColors: Array<colors> = [];
+  filteredColors.forEach((value, key) => {
+    if (
+      selectedAnswer.some((item) => item.value === key) ||
+      selectedAnswer.length === 0
+    ) {
+      mapColors.push({ name: key, color: value });
+    }
+  });
   return (
     <Map
       mapLayer={selected.value as string}
       showDialect={showDialects}
-      usedColors={usedColors[selectedQuestion.question.value as number].colors}
+      usedColors={mapColors}
       selectedQuestion={selectedQuestion.question}
     ></Map>
   );
@@ -260,6 +300,39 @@ const DataDropdown = (
   );
 };
 
+const DropdownMultipleSelect = (
+  entries: Array<questionColors>,
+  selected: dropDownEntry<undefined>[],
+  setSelectedVar: (arg0: dropDownEntry<undefined>[]) => void
+) => {
+  const selectedQuestion = useSelectedQuestion();
+  const selectedColor =
+    entries[selectedQuestion.question.value as number].colors;
+  const colorKeyArray = Array.from(selectedColor.keys());
+  const dropDownValues = colorKeyArray.map((colors) => {
+    return { name: colors, value: colors };
+  }) as Array<dropDownEntry<undefined>>;
+  return (
+    <Select
+      isMulti
+      name='Antworten'
+      value={selected}
+      options={dropDownValues}
+      className='w-72 rounded-lg basic-multi-select'
+      classNamePrefix='select'
+      getOptionLabel={(option) => option.name}
+      getOptionValue={(option) => option.value as string}
+      onChange={(id) => {
+        const res = [] as dropDownEntry<undefined>[];
+        id.map((el) => {
+          res.push({ name: el.name, value: el.value });
+        });
+        setSelectedVar(res);
+      }}
+    />
+  );
+};
+
 const RegDropDown = (
   regDropdown: Array<dropDownEntry<undefined>>,
   selectedReg: dropDownEntry<undefined>,
@@ -288,13 +361,33 @@ const VariationDropdown = (
   );
 };
 
+const AnswerDropdown = (
+  usedColors: Array<questionColors>,
+  selected: dropDownEntry<undefined>[],
+  setSelectedVar: (arg0: dropDownEntry<undefined>[]) => void
+) => {
+  const selectedQuestion = useSelectedQuestion();
+  const selectedColor =
+    usedColors[selectedQuestion.question.value as number].colors;
+  const colorKeyArray = Array.from(selectedColor.keys());
+  const dropDownValues = colorKeyArray.map((colors) => {
+    return { name: colors, value: colors };
+  }) as Array<dropDownEntry<undefined>>;
+  return (
+    <DropdownMultiple
+      entries={dropDownValues}
+      selected={selected}
+      setSelected={(val: dropDownEntry<undefined>[]) => setSelectedVar(val)}
+    />
+  );
+};
+
 interface MapAnalysisProps {
   usedColors: Array<questionColors>;
 }
 
 export default function MapAnalysis({ usedColors }: MapAnalysisProps) {
   const questionContext = useQuestionContext();
-
   const layerEntries: Array<dropDownEntry<undefined>> = [
     { name: 'OpenStreetMap Tileset', value: 'osm' },
     { name: 'Bundesländer GeoJSON', value: 'geojson' },
@@ -364,7 +457,13 @@ export default function MapAnalysis({ usedColors }: MapAnalysisProps) {
     variationDropdown[0]
   );
 
+  const [selectedAnswer, setSelectedAnswer] = useState<
+    dropDownEntry<undefined>[]
+  >([]);
+
   const [showDialects, setShowDialects] = useState(false);
+
+  console.log(selectedAnswer);
   return (
     <SelectedQuestion.Provider
       value={{
@@ -373,18 +472,25 @@ export default function MapAnalysis({ usedColors }: MapAnalysisProps) {
           : ({} as dropDownEntry<evaluatedAnswer[]>),
         selectedReg: selectedReg,
         selectedVar: selectedVar,
+        selectedAnswer: selectedAnswer,
       }}
     >
       <SelectedContext.Provider value={selected}>
         <WorkBox
-          Element={() => MapComponent(showDialects, usedColors)}
+          Element={() => MapComponent(showDialects, usedColors, selectedAnswer)}
           UiElements={[
             () => Dropdown(layerEntries, setSelected),
-            () => Checkbox(showDialects, setShowDialects),
+            //() => Checkbox(showDialects, setShowDialects),
             () => DataDropdown(setSelectedQ),
-            () => RegDropDown(regDropdown, selectedReg, setSelectedReg),
+            //() => RegDropDown(regDropdown, selectedReg, setSelectedReg),
             () =>
               VariationDropdown(variationDropdown, selectedVar, setSelectedVar),
+            () =>
+              DropdownMultipleSelect(
+                usedColors,
+                selectedAnswer,
+                setSelectedAnswer
+              ),
           ]}
         ></WorkBox>
         <div className='mt-10'>

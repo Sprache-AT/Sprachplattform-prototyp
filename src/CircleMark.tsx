@@ -42,8 +42,8 @@ export default function CircleMark({
           feat.geometry.coordinates.length === 2
         ) {
           const position: LatLngExpression = [
-            feat.geometry.coordinates[0],
             feat.geometry.coordinates[1],
+            feat.geometry.coordinates[0],
           ];
           return (
             <Circle

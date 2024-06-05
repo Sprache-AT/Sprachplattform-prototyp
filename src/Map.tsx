@@ -1,6 +1,6 @@
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 import CircleMark from './CircleMark';
-import { dropDownEntry, evaluatedAnswer, question } from './types';
+import { colors, dropDownEntry, evaluatedAnswer, question } from './types';
 import { LatLngExpression } from 'leaflet';
 
 import * as data from './data/fr41.json';
@@ -13,7 +13,7 @@ import Legend from './Legend';
 type MapProps = {
   mapLayer: string;
   showDialect: boolean;
-  usedColors: Map<string, string> | undefined;
+  usedColors: Array<colors> | undefined;
   selectedQuestion: dropDownEntry<evaluatedAnswer[]>;
 };
 
