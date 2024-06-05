@@ -48,13 +48,13 @@ function App() {
   const { isLoading, error, data } = useQuery({
     queryKey: ['data'],
     queryFn: async () => {
-      const dataListFr41 = await fetch('./src/data/fr41.json').then((res) =>
-        res.json()
-      );
-      const dataListFr3 = await fetch('./src/data/fr3.json').then((res) =>
-        res.json()
-      );
-      const dataList = [dataListFr41, dataListFr3];
+      const dataList = [];
+      for (var i = 1; i < 46; i++) {
+        const curr_question = await fetch(`./src/data/fr${i}.json`).then(
+          (res) => res.json()
+        );
+        dataList.push(curr_question);
+      }
       return initalizeData(dataList);
     },
   });
