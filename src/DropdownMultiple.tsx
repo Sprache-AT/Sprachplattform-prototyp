@@ -16,7 +16,7 @@ export default function DropdownMultiple<T>({
 }: MapDropdownProps<T>) {
   function handleChange(val: Array<dropDownEntry<T>>) {
     const newVal = val.filter(
-      (el, i, arr) => arr.filter((t) => t.value === el.value).length < 2
+      (el, _, arr) => arr.filter((t) => t.value === el.value).length < 2
     );
     setSelected(newVal);
   }

@@ -3,8 +3,6 @@ import './App.css';
 
 import MapAnalysis from './MapAnalysis.tsx';
 
-import * as dataFr41 from './data/fr41.json';
-import * as dataFr3 from './data/fr3.json';
 import {
   dropDownEntry,
   evaluatedAnswer,
@@ -14,11 +12,7 @@ import {
 import { countAnswersinQuestion } from './service/EvaluateData.ts';
 import WorkBox from './WorkBox.tsx';
 import Article from './Article.tsx';
-import {
-  QueryClient,
-  QueryClientProvider,
-  useQuery,
-} from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 
 export const QuestionContext = createContext<
   dropDownEntry<evaluatedAnswer[]>[] | undefined

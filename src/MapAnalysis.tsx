@@ -361,27 +361,6 @@ const VariationDropdown = (
   );
 };
 
-const AnswerDropdown = (
-  usedColors: Array<questionColors>,
-  selected: dropDownEntry<undefined>[],
-  setSelectedVar: (arg0: dropDownEntry<undefined>[]) => void
-) => {
-  const selectedQuestion = useSelectedQuestion();
-  const selectedColor =
-    usedColors[selectedQuestion.question.value as number].colors;
-  const colorKeyArray = Array.from(selectedColor.keys());
-  const dropDownValues = colorKeyArray.map((colors) => {
-    return { name: colors, value: colors };
-  }) as Array<dropDownEntry<undefined>>;
-  return (
-    <DropdownMultiple
-      entries={dropDownValues}
-      selected={selected}
-      setSelected={(val: dropDownEntry<undefined>[]) => setSelectedVar(val)}
-    />
-  );
-};
-
 interface MapAnalysisProps {
   usedColors: Array<questionColors>;
 }
@@ -480,9 +459,9 @@ export default function MapAnalysis({ usedColors }: MapAnalysisProps) {
           Element={() => MapComponent(showDialects, usedColors, selectedAnswer)}
           UiElements={[
             () => Dropdown(layerEntries, setSelected),
-            //() => Checkbox(showDialects, setShowDialects),
+            () => Checkbox(showDialects, setShowDialects),
             () => DataDropdown(setSelectedQ),
-            //() => RegDropDown(regDropdown, selectedReg, setSelectedReg),
+            () => RegDropDown(regDropdown, selectedReg, setSelectedReg),
             () =>
               VariationDropdown(variationDropdown, selectedVar, setSelectedVar),
             () =>
