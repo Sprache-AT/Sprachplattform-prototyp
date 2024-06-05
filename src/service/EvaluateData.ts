@@ -17,9 +17,6 @@ export const countAnswersinQuestion = (
   const colorMap = new Map<string, string>();
   inputData.features.forEach((feat) => {
     const singleLocation = evaluateSingleLocation(feat, colorMap, colors);
-    if (feat.location === 'Lauterach' && feat.title === 'STREICHHOLZ') {
-      console.log(singleLocation);
-    }
     singleLocation.sort((a, b) => a.id.localeCompare(b.id));
     res.push({
       location: feat.location,

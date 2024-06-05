@@ -441,7 +441,6 @@ export default function MapAnalysis({ usedColors }: MapAnalysisProps) {
 
   const [showDialects, setShowDialects] = useState(false);
 
-  console.log(selectedAnswer);
   return (
     <SelectedQuestion.Provider
       value={{
