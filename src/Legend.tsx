@@ -1,21 +1,22 @@
 import { useMap } from 'react-leaflet';
 import { Control, DomUtil } from 'leaflet';
+import { colors } from './types';
 
 interface LegendProps {
-  colors?: Map<string, string>;
+  colors?: Array<colors>;
 }
 
 export default function Legend({ colors }: LegendProps) {
   const map = useMap();
-  if (!colors || colors.size === 0) return null;
+  if (!colors || colors.length === 0) return null;
   const legend = new Control({ position: 'bottomright' });
   legend.onAdd = function () {
     const div = DomUtil.create('div', 'info legend');
     const size = 15;
     div.className = 'bg-white w-fit p-2 rounded-lg shadow-md';
     if (colors) {
-      colors?.forEach((value, key) => {
-        const color = value;
+      colors?.forEach((item) => {
+        const color = item.color;
         div.innerHTML += `<div class="flex flex-row"><svg
         xmlns='http://www.w3.org/2000/svg'
         width=${size}
@@ -31,7 +32,7 @@ export default function Legend({ colors }: LegendProps) {
           stroke='black'
           strokeWidth=0.2
         />
-      </svg><i style="background:${value}"></i>${key}</div>`;
+      </svg><i style="background:${color}"></i>${item.name}</div>`;
       });
     }
     return div;

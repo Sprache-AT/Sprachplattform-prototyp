@@ -1,5 +1,10 @@
 import { createContext, useContext, useState } from 'react';
-import { dropDownEntry, evaluatedAnswer, questionColors } from './types';
+import {
+  colors,
+  dropDownEntry,
+  evaluatedAnswer,
+  questionColors,
+} from './types';
 import WorkBox from './WorkBox';
 import Map from './Map';
 import MapDropdown from './MapDropdown';
@@ -225,19 +230,28 @@ const VariantTableComponent = (
 
 const MapComponent = (
   showDialects: boolean,
-  usedColors: Array<questionColors>
+  usedColors: Array<questionColors>,
+  selectedAnswer: dropDownEntry<undefined>[]
 ) => {
   const selected = useSelection();
   const selectedQuestion = useSelectedQuestion();
 
   let filteredColors =
     usedColors[selectedQuestion.question.value as number].colors;
-
+  let mapColors: Array<colors> = [];
+  filteredColors.forEach((value, key) => {
+    if (
+      selectedAnswer.some((item) => item.value === key) ||
+      selectedAnswer.length === 0
+    ) {
+      mapColors.push({ name: key, color: value });
+    }
+  });
   return (
     <Map
       mapLayer={selected.value as string}
       showDialect={showDialects}
-      usedColors={filteredColors}
+      usedColors={mapColors}
       selectedQuestion={selectedQuestion.question}
     ></Map>
   );
@@ -304,7 +318,7 @@ const DropdownMultipleSelect = (
       name='Antworten'
       value={selected}
       options={dropDownValues}
-      className='basic-multi-select'
+      className='w-72 rounded-lg basic-multi-select'
       classNamePrefix='select'
       getOptionLabel={(option) => option.name}
       getOptionValue={(option) => option.value as string}
@@ -448,6 +462,8 @@ export default function MapAnalysis({ usedColors }: MapAnalysisProps) {
   >([]);
 
   const [showDialects, setShowDialects] = useState(false);
+
+  console.log(selectedAnswer);
   return (
     <SelectedQuestion.Provider
       value={{
@@ -461,12 +477,12 @@ export default function MapAnalysis({ usedColors }: MapAnalysisProps) {
     >
       <SelectedContext.Provider value={selected}>
         <WorkBox
-          Element={() => MapComponent(showDialects, usedColors)}
+          Element={() => MapComponent(showDialects, usedColors, selectedAnswer)}
           UiElements={[
             () => Dropdown(layerEntries, setSelected),
-            () => Checkbox(showDialects, setShowDialects),
+            //() => Checkbox(showDialects, setShowDialects),
             () => DataDropdown(setSelectedQ),
-            () => RegDropDown(regDropdown, selectedReg, setSelectedReg),
+            //() => RegDropDown(regDropdown, selectedReg, setSelectedReg),
             () =>
               VariationDropdown(variationDropdown, selectedVar, setSelectedVar),
             () =>

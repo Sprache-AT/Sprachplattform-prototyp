@@ -27,6 +27,8 @@ export type featureAnswer = {
   }>;
 };
 
+export type colors = { name: string; color: string };
+
 export interface circleDiagramData {
   // Value of the answer
   v: number;
