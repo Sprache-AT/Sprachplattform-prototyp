@@ -13,7 +13,6 @@ import CheckboxComp from './CheckboxComp';
 import 'leaflet/dist/leaflet.css';
 import Table from './Table';
 import { QuestionContext } from './App';
-import DropdownMultiple from './DropdownMultiple';
 
 import Select from 'react-select';
 
